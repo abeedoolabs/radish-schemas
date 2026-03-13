@@ -1,0 +1,630 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://radish.dev/schemas/types.schema.json",
+  "title": "Radish Blueprint (Data Layer)",
+  "type": "object",
+  "required": [
+    "entities"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "owned": {
+          "type": "boolean"
+        },
+        "timestamps": {
+          "type": "boolean"
+        },
+        "adminRole": {
+          "type": "string"
+        }
+      }
+    },
+    "entities": {
+      "type": "object",
+      "minProperties": 1,
+      "patternProperties": {
+        "^[A-Z][A-Za-z0-9_]*$": {
+          "type": "object",
+          "required": [
+            "plural",
+            "fields"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "entityId": {
+              "type": "string"
+            },
+            "label": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "plural": {
+              "type": "string",
+              "minLength": 1
+            },
+            "ownership": {
+              "type": "string",
+              "enum": ["user", "system", "tenant"],
+              "default": "user"
+            },
+            "extends": {
+              "type": "string",
+              "description": "Base type to extend from. Can be EntityBase, SystemEntityBase, ContentBase, or another entity name.",
+              "pattern": "^([A-Z][A-Za-z0-9_]*|EntityBase|SystemEntityBase|ContentBase)$"
+            },
+            "collation": {
+              "type": "object",
+              "description": "MongoDB collation settings for this collection",
+              "additionalProperties": false,
+              "properties": {
+                "locale": {
+                  "type": "string",
+                  "description": "The ICU locale identifier (e.g., 'en', 'en_US', 'fr')",
+                  "default": "en"
+                },
+                "strength": {
+                  "type": "integer",
+                  "description": "Comparison level: 1=primary(base chars), 2=secondary(+diacritics), 3=tertiary(+case)",
+                  "minimum": 1,
+                  "maximum": 5,
+                  "default": 2
+                },
+                "numericOrdering": {
+                  "type": "boolean",
+                  "description": "Compare numeric strings as numbers (e.g., '10' > '2')",
+                  "default": true
+                },
+                "caseLevel": {
+                  "type": "boolean",
+                  "description": "Include case comparison at strength 1 or 2"
+                },
+                "caseFirst": {
+                  "type": "string",
+                  "enum": ["upper", "lower", "off"],
+                  "description": "Sort order of case: 'upper' first, 'lower' first, or 'off'"
+                },
+                "normalization": {
+                  "type": "boolean",
+                  "description": "Check text normalization"
+                },
+                "backwards": {
+                  "type": "boolean",
+                  "description": "Compare diacritics from back to front"
+                },
+                "alternate": {
+                  "type": "string",
+                  "enum": ["non-ignorable", "shifted"],
+                  "description": "Treatment of whitespace and punctuation"
+                },
+                "maxVariable": {
+                  "type": "string",
+                  "enum": ["punct", "space"],
+                  "description": "Characters considered ignorable when alternate='shifted'"
+                }
+              }
+            },
+            "fields": {
+              "type": "object",
+              "minProperties": 1,
+              "patternProperties": {
+                "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+                  "type": "object",
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "string",
+                        "int",
+                        "float",
+                        "boolean",
+                        "any",
+                        "url",
+                        "isoDate",
+                        "objectId",
+                        "enum",
+                        "object",
+                        "string[]",
+                        "int[]",
+                        "float[]",
+                        "boolean[]",
+                        "objectId[]",
+                        "array",
+                        "secretKey",
+                        "encryptedKey"
+                      ]
+                    },
+                    "required": {
+                      "type": "boolean"
+                    },
+                    "optional": {
+                      "type": "boolean"
+                    },
+                    "unique": {
+                      "type": "boolean"
+                    },
+                    "index": {
+                      "type": "boolean"
+                    },
+                    "default": {},
+                    "allowedMacros": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "UUID",
+                          "NOW",
+                          "TIMESTAMP",
+                          "TODAY",
+                          "USER_ID"
+                        ]
+                      }
+                    },
+                    "values": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "description": "Legacy simple enum format"
+                          },
+                          {
+                            "type": "object",
+                            "description": "Enhanced enum format with key-label pairs",
+                            "required": ["key"],
+                            "additionalProperties": false,
+                            "properties": {
+                              "key": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "search": {
+                      "type": "boolean"
+                    },
+                    "trackChanges": {
+                      "type": "boolean",
+                      "description": "Enable detailed field-level change tracking with metadata (change reason, approvals, etc.)"
+                    },
+                    "ref": {
+                      "type": "string"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "lastChars": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 20,
+                      "default": 4
+                    },
+                    "shape": {
+                      "type": "object",
+                      "patternProperties": {
+                        "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+                          "$ref": "#/definitions/field"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "items": {
+                      "$ref": "#/definitions/field"
+                    },
+                    "internal": {
+                      "type": "boolean",
+                      "default": false
+                    },
+                    "select": {
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "secret": {
+                      "type": "string",
+                      "enum": [
+                        "hash",
+                        "encrypt"
+                      ]
+                    },
+                    "hash": {
+                      "type": "object",
+                      "properties": {
+                        "algo": {
+                          "type": "string",
+                          "enum": [
+                            "argon2id",
+                            "bcrypt"
+                          ],
+                          "default": "argon2id"
+                        },
+                        "params": {
+                          "type": "object",
+                          "additionalProperties": true
+                        }
+                      },
+                      "required": [
+                        "algo"
+                      ],
+                      "additionalProperties": true
+                    },
+                    "expose": {
+                      "type": "object",
+                      "properties": {
+                        "contracts": {
+                          "type": "boolean"
+                        },
+                        "create": {
+                          "type": "boolean"
+                        },
+                        "update": {
+                          "type": "boolean"
+                        },
+                        "read": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "enum"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "required": [
+                          "values"
+                        ]
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "object"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "required": [
+                          "shape"
+                        ]
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "array"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "required": [
+                          "items"
+                        ]
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "objectId"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "ref": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "objectId[]"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "ref": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false
+            },
+            "versioning": {
+              "type": "string",
+              "enum": ["full", "simple"],
+              "description": "Enable versioning: 'full' = complete snapshots with revert capability, 'simple' = lightweight audit log"
+            },
+            "filters": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "indexes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "fields"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "fields": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1
+                  },
+                  "unique": {
+                    "type": "boolean"
+                  },
+                  "sparse": {
+                    "type": "boolean"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "virtualFilters": {
+              "type": "object",
+              "patternProperties": {
+                "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+                  "type": "object",
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "string",
+                        "int",
+                        "float",
+                        "boolean",
+                        "any",
+                        "url",
+                        "isoDate",
+                        "objectId",
+                        "enum",
+                        "object",
+                        "string[]",
+                        "int[]",
+                        "float[]",
+                        "boolean[]",
+                        "objectId[]",
+                        "array",
+                        "secretKey",
+                        "encryptedKey"
+                      ]
+                    },
+                    "default": {}
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "field": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "int",
+            "float",
+            "boolean",
+            "any",
+            "url",
+            "isoDate",
+            "objectId",
+            "enum",
+            "object",
+            "string[]",
+            "int[]",
+            "float[]",
+            "boolean[]",
+            "objectId[]",
+            "array"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "optional": {
+          "type": "boolean"
+        },
+        "unique": {
+          "type": "boolean"
+        },
+        "index": {
+          "type": "boolean"
+        },
+        "default": {},
+        "allowedMacros": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "UUID",
+              "NOW",
+              "TIMESTAMP",
+              "TODAY",
+              "USER_ID"
+            ]
+          }
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "Legacy simple enum format"
+              },
+              {
+                "type": "object",
+                "description": "Enhanced enum format with key-label pairs",
+                "required": ["key"],
+                "additionalProperties": false,
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "search": {
+          "type": "boolean"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "shape": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+              "$ref": "#/definitions/field"
+            }
+          },
+          "additionalProperties": false
+        },
+        "items": {
+          "$ref": "#/definitions/field"
+        },
+        "internal": {
+          "type": "boolean",
+          "default": false
+        },
+        "select": {
+          "type": "boolean",
+          "default": true
+        },
+        "secret": {
+          "type": "string",
+          "enum": [
+            "hash",
+            "encrypt"
+          ]
+        },
+        "hash": {
+          "type": "object",
+          "properties": {
+            "algo": {
+              "type": "string",
+              "enum": [
+                "argon2id",
+                "bcrypt"
+              ],
+              "default": "argon2id"
+            },
+            "params": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "required": [
+            "algo"
+          ],
+          "additionalProperties": true
+        },
+        "expose": {
+          "type": "object",
+          "properties": {
+            "contracts": {
+              "type": "boolean"
+            },
+            "create": {
+              "type": "boolean"
+            },
+            "update": {
+              "type": "boolean"
+            },
+            "read": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  }
+}

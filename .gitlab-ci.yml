@@ -1,0 +1,31 @@
+image: node:20
+
+stages:
+  - test
+  - publish
+
+cache:
+  paths:
+    - node_modules/
+
+test:
+  stage: test
+  script:
+    - npm install
+    - node test.js
+  only:
+    - main
+    - merge_requests
+
+publish:
+  stage: publish
+  script:
+    - npm install
+    - |
+      echo "@radish:registry=${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/npm/" >> .npmrc
+      echo "${CI_API_V4_URL#https?}/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=\${CI_JOB_TOKEN}" >> .npmrc
+    - npm publish
+  only:
+    - tags
+  except:
+    - branches
