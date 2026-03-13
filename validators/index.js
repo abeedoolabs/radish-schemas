@@ -1,19 +1,6 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Load schemas
-const typesSchema = JSON.parse(
-  readFileSync(join(__dirname, '../schemas/types.schema.json'), 'utf-8')
-);
-const rolesSchema = JSON.parse(
-  readFileSync(join(__dirname, '../schemas/roles.schema.json'), 'utf-8')
-);
+import { typesSchema, rolesSchema } from '../schemas/index.js';
 
 // Initialize AJV
 const ajv = new Ajv({ allErrors: true, strict: false });

@@ -21,9 +21,10 @@ npm install @radish/schemas
 
 ```javascript
 import { validateBlueprint, formatValidationErrors } from '@radish/schemas';
+import { readFileSync } from 'fs';
 import yaml from 'yaml';
 
-const blueprintYaml = yaml.parse(fs.readFileSync('types.yml', 'utf8'));
+const blueprintYaml = yaml.parse(readFileSync('types.yml', 'utf8'));
 
 const result = validateBlueprint(blueprintYaml, 'types');
 

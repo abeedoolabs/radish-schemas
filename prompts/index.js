@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { getSchema } from '../schemas/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -38,14 +39,5 @@ export function buildPrompt(description, schema) {
  * @returns {string} Stringified JSON schema
  */
 export function getSchemaForPrompt(type) {
-  const schemas = {
-    types: JSON.parse(
-      readFileSync(join(__dirname, '../schemas/types.schema.json'), 'utf-8')
-    ),
-    roles: JSON.parse(
-      readFileSync(join(__dirname, '../schemas/roles.schema.json'), 'utf-8')
-    )
-  };
-
-  return JSON.stringify(schemas[type], null, 2);
+  return JSON.stringify(getSchema(type), null, 2);
 }
