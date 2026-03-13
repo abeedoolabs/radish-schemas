@@ -51,8 +51,27 @@ if (!result2.valid) {
 }
 console.log('');
 
-// Test 3: Get schemas
-console.log('Test 3: Get schemas');
+// Test 3: Missing version field
+console.log('Test 3: Missing version field (should fail)');
+const noVersionBlueprint = {
+  entities: {
+    Post: {
+      plural: 'posts',
+      fields: {
+        title: { type: 'string' }
+      }
+    }
+  }
+};
+const result3 = validateBlueprint(noVersionBlueprint, 'types');
+console.log(!result3.valid ? '✅ PASS' : '❌ FAIL');
+if (!result3.valid) {
+  console.log('Expected errors:', formatValidationErrors(result3.errors));
+}
+console.log('');
+
+// Test 4: Get schemas
+console.log('Test 4: Get schemas');
 const schemas = getSchemas();
 console.log(schemas.types ? '✅ types schema loaded' : '❌ types schema missing');
 console.log(schemas.roles ? '✅ roles schema loaded' : '❌ roles schema missing');

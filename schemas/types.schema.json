@@ -4,6 +4,7 @@
   "title": "Radish Blueprint (Data Layer)",
   "type": "object",
   "required": [
+    "version",
     "entities"
   ],
   "additionalProperties": false,
