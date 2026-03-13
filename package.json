@@ -36,6 +36,6 @@
     "yaml": "^2.5.0"
   },
   "publishConfig": {
-    "@radish:registry": "https://your-gitlab-instance.com/api/v4/projects/YOUR_PROJECT_ID/packages/npm/"
+    "@radish:registry": "https://gitlab.mini1.abeedoo.com/api/v4/projects/6/packages/npm/"
   }
 }
