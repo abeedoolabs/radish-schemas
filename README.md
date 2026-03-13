@@ -90,7 +90,7 @@ const response = await openai.chat.completions.create({
 
 ### Current Version
 
-- **Package Version:** `@radish/schemas@1.0.0`
+- **Package Version:** `@radish/schemas@1.1.0`
 - **Blueprint Spec Version:** `1`
 - **Minimum CLI Version:** `radish-cli@0.1.0`
 
@@ -111,7 +111,7 @@ For detailed versioning strategy, see [VERSIONING-STRATEGY.md](./VERSIONING-STRA
 ```javascript
 import { VERSIONING } from '@radish/schemas';
 
-console.log(VERSIONING.packageVersion);           // "1.0.0"
+console.log(VERSIONING.packageVersion);           // "1.1.0"
 console.log(VERSIONING.currentSpecVersion);       // 1
 console.log(VERSIONING.supportedSpecVersions);    // [1]
 console.log(VERSIONING.minCliVersion);            // "0.1.0"
