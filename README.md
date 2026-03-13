@@ -86,6 +86,42 @@ const response = await openai.chat.completions.create({
 └── index.js          # Main exports
 ```
 
+## Version Compatibility
+
+### Current Version
+
+- **Package Version:** `@radish/schemas@1.0.0`
+- **Blueprint Spec Version:** `1`
+- **Minimum CLI Version:** `radish-cli@0.1.0`
+
+### Compatibility Policy
+
+`@radish/schemas` follows semantic versioning with special consideration for blueprint compatibility:
+
+- **Major version bumps** (e.g., 1.x → 2.x) indicate **breaking changes to blueprint format**
+- **Minor version bumps** (e.g., 1.0 → 1.1) add **backward-compatible features**
+- **Patch version bumps** (e.g., 1.0.0 → 1.0.1) include **bug fixes and improvements**
+
+**Important:** All `1.x` releases support blueprint spec version `1`. When blueprint format changes in a breaking way, both the package major version and spec version will increment together.
+
+For detailed versioning strategy, see [VERSIONING-STRATEGY.md](./VERSIONING-STRATEGY.md).
+
+### Using VERSIONING Metadata
+
+```javascript
+import { VERSIONING } from '@radish/schemas';
+
+console.log(VERSIONING.packageVersion);           // "1.0.0"
+console.log(VERSIONING.currentSpecVersion);       // 1
+console.log(VERSIONING.supportedSpecVersions);    // [1]
+console.log(VERSIONING.minCliVersion);            // "0.1.0"
+
+// Validate compatibility
+if (!VERSIONING.supportedSpecVersions.includes(blueprintSpecVersion)) {
+  throw new Error(`Blueprint spec version ${blueprintSpecVersion} is not supported`);
+}
+```
+
 ## API Reference
 
 ### Validators
