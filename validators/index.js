@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import { typesSchema, rolesSchema } from '../schemas/index.js';
+import { typesSchema, rolesSchema, appSchema } from '../schemas/index.js';
 
 // Initialize AJV
 const ajv = new Ajv({ allErrors: true, strict: false });
@@ -9,13 +9,14 @@ addFormats(ajv);
 // Compile validators
 const validators = {
   types: ajv.compile(typesSchema),
-  roles: ajv.compile(rolesSchema)
+  roles: ajv.compile(rolesSchema),
+  app: ajv.compile(appSchema)
 };
 
 /**
  * Validate a blueprint against its schema
  * @param {any} data - Parsed YAML/JSON data to validate
- * @param {'types' | 'roles'} type - Schema type to validate against
+ * @param {'types' | 'roles' | 'app'} type - Schema type to validate against
  * @returns {{ valid: boolean, errors: Array }}
  */
 export function validateBlueprint(data, type) {
@@ -34,12 +35,13 @@ export function validateBlueprint(data, type) {
 
 /**
  * Get the raw JSON schemas
- * @returns {{ types: object, roles: object }}
+ * @returns {{ types: object, roles: object, app: object }}
  */
 export function getSchemas() {
   return {
     types: typesSchema,
-    roles: rolesSchema
+    roles: rolesSchema,
+    app: appSchema
   };
 }
 
@@ -63,4 +65,4 @@ export function formatValidationErrors(errors) {
     .join('\n');
 }
 
-export { typesSchema, rolesSchema, validators };
+export { typesSchema, rolesSchema, appSchema, validators };
