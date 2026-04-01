@@ -36,40 +36,57 @@ if (result.valid) {
 }
 ```
 
+### Validating App Blueprints
+
+```javascript
+import { validateBlueprint, formatValidationErrors } from '@radish/schemas';
+import { readFileSync } from 'fs';
+import yaml from 'yaml';
+
+const appBlueprint = yaml.parse(readFileSync('app.yml', 'utf8'));
+
+const result = validateBlueprint(appBlueprint, 'app');
+
+if (result.valid) {
+  console.log('App blueprint is valid');
+} else {
+  console.error(formatValidationErrors(result.errors));
+}
+```
+
 ### Getting Schemas
 
 ```javascript
-import { getSchemas, typesSchema, rolesSchema } from '@radish/schemas';
+import { getSchemas, typesSchema, rolesSchema, appSchema } from '@radish/schemas';
 
 // Get all schemas
 const schemas = getSchemas();
 console.log(schemas.types);
 console.log(schemas.roles);
+console.log(schemas.app);
 
 // Or import directly
 console.log(typesSchema);
 console.log(rolesSchema);
+console.log(appSchema);
 ```
 
 ### AI Prompts
 
 ```javascript
-import { getSchemaPrompt, buildPrompt } from '@radish/schemas/prompts';
+import { getSchemaPrompt, getAppPrompt, buildPrompt } from '@radish/schemas/prompts';
 
-// Get the base prompt template
-const template = getSchemaPrompt();
+// Get the data layer prompt template
+const schemaTemplate = getSchemaPrompt();
+
+// Get the app blueprint prompt template
+const appTemplate = getAppPrompt();
 
 // Build a prompt with user description
 const prompt = buildPrompt(
   'A blog platform with posts, comments, and users',
   typesSchema
 );
-
-// Use with your AI provider
-const response = await openai.chat.completions.create({
-  model: 'gpt-4',
-  messages: [{ role: 'user', content: prompt }]
-});
 ```
 
 ## Package Structure
@@ -77,12 +94,14 @@ const response = await openai.chat.completions.create({
 ```
 @radish/schemas/
 ├── schemas/          # JSON Schema files
-│   ├── types.schema.json
-│   └── roles.schema.json
+│   ├── types.schema.json    # Data layer entities/fields
+│   ├── roles.schema.json    # Roles and permissions
+│   └── app.schema.json      # Application blueprint
 ├── validators/       # Validation utilities
 │   └── index.js
 ├── prompts/          # AI prompt templates
-│   └── radish-schema-generation.md
+│   ├── radish-schema-generation.md   # Types/roles generation
+│   └── radish-app-generation.md      # App blueprint generation
 └── index.js          # Main exports
 ```
 
@@ -132,7 +151,7 @@ Validates data against a schema.
 
 - **Parameters:**
   - `data` (any): Parsed YAML/JSON data
-  - `type` ('types' | 'roles'): Schema type
+  - `type` ('types' | 'roles' | 'app'): Schema type
 - **Returns:** `{ valid: boolean, errors: Array }`
 
 #### `formatValidationErrors(errors)`
@@ -147,13 +166,19 @@ Formats AJV errors for display.
 
 Gets all schemas.
 
-- **Returns:** `{ types: object, roles: object }`
+- **Returns:** `{ types: object, roles: object, app: object }`
 
 ### Prompts
 
 #### `getSchemaPrompt()`
 
-Gets the AI prompt template.
+Gets the AI prompt template for types/roles generation.
+
+- **Returns:** `string` - Prompt markdown
+
+#### `getAppPrompt()`
+
+Gets the AI prompt template for app blueprint generation.
 
 - **Returns:** `string` - Prompt markdown
 
@@ -165,6 +190,21 @@ Builds a complete AI prompt.
   - `description` (string): User's description
   - `schema` (object): JSON schema
 - **Returns:** `string` - Complete prompt
+
+### Schemas
+
+#### `appSchema`
+
+The app blueprint JSON Schema. Validates application-level metadata including:
+- **app** - Name, description, domain, tags
+- **audience** - User personas (primary, secondary, admin)
+- **workflows** - Core user journeys with actors
+- **categories** - Content taxonomy
+- **style** - Branding and UI hints
+- **features** - Feature flags (auth, roles, api, search, etc.)
+- **entityOverview** - High-level entity descriptions grouped by domain concern
+- **accessPatterns** - Who can do what, by access level
+- **database** - Database configuration
 
 ## License
 

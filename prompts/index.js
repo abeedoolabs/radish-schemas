@@ -18,6 +18,17 @@ export function getSchemaPrompt() {
 }
 
 /**
+ * Get the AI app blueprint generation prompt template
+ * @returns {string} Prompt markdown content
+ */
+export function getAppPrompt() {
+  return readFileSync(
+    join(__dirname, 'radish-app-generation.md'),
+    'utf-8'
+  );
+}
+
+/**
  * Build a complete prompt with user description and schema
  * @param {string} description - User's app description
  * @param {object} schema - JSON schema object
@@ -35,7 +46,7 @@ export function buildPrompt(description, schema) {
 
 /**
  * Get schema JSON for inclusion in prompts
- * @param {'types' | 'roles'} type - Schema type
+ * @param {'types' | 'roles' | 'app'} type - Schema type
  * @returns {string} Stringified JSON schema
  */
 export function getSchemaForPrompt(type) {

@@ -1,0 +1,279 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://radish.dev/schemas/app.schema.json",
+  "title": "Radish App Blueprint",
+  "description": "Schema for defining application-level metadata, audience, workflows, features, and entity overview. This blueprint drives generation of types.yml, roles.yml, and UI layer blueprints.",
+  "type": "object",
+  "required": [
+    "version",
+    "app"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Blueprint spec version"
+    },
+    "app": {
+      "type": "object",
+      "description": "Core application metadata",
+      "required": [
+        "name",
+        "description"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Application name (PascalCase or camelCase, used for code generation)"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Human-readable display name"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "description": "Full description of the application purpose and functionality"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Application version (semver format)"
+        },
+        "domain": {
+          "type": "string",
+          "description": "Business domain (e.g., education, e-commerce, healthcare)"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Searchable tags for categorization"
+        }
+      }
+    },
+    "audience": {
+      "type": "object",
+      "description": "Target audience and user personas",
+      "additionalProperties": false,
+      "properties": {
+        "primary": {
+          "type": "string",
+          "description": "Primary user persona"
+        },
+        "secondary": {
+          "type": "string",
+          "description": "Secondary user persona"
+        },
+        "admin": {
+          "type": "string",
+          "description": "Administrative user persona"
+        }
+      }
+    },
+    "workflows": {
+      "type": "array",
+      "description": "Core user workflows describing what users actually do",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "actor",
+          "description"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Workflow name"
+          },
+          "actor": {
+            "type": "string",
+            "description": "User persona performing this workflow (e.g., student, instructor, admin)"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Description of the workflow steps and goals"
+          }
+        }
+      }
+    },
+    "categories": {
+      "type": "array",
+      "description": "Content categories and taxonomy",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Category name"
+          },
+          "subcategories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Subcategory names"
+          }
+        }
+      }
+    },
+    "style": {
+      "type": "object",
+      "description": "Style and branding hints for UI generation",
+      "additionalProperties": false,
+      "properties": {
+        "theme": {
+          "type": "string",
+          "description": "Theme name or identifier"
+        },
+        "tone": {
+          "type": "string",
+          "description": "Brand tone (e.g., professional, playful, minimal)"
+        },
+        "palette": {
+          "type": "string",
+          "description": "Color palette description or key colors"
+        },
+        "typography": {
+          "type": "string",
+          "description": "Typography preferences"
+        },
+        "layout": {
+          "type": "string",
+          "description": "Layout style preferences"
+        },
+        "icons": {
+          "type": "string",
+          "description": "Icon style preferences"
+        },
+        "imagery": {
+          "type": "string",
+          "description": "Imagery and placeholder style"
+        }
+      }
+    },
+    "features": {
+      "type": "object",
+      "description": "Feature flags indicating what capabilities this app includes",
+      "additionalProperties": false,
+      "properties": {
+        "auth": {
+          "type": "boolean",
+          "description": "Authentication system"
+        },
+        "roles": {
+          "type": "boolean",
+          "description": "Role-based access control"
+        },
+        "adminPanel": {
+          "type": "boolean",
+          "description": "Administrative panel"
+        },
+        "api": {
+          "type": "boolean",
+          "description": "REST API endpoints"
+        },
+        "search": {
+          "type": "boolean",
+          "description": "Search functionality"
+        },
+        "pagination": {
+          "type": "boolean",
+          "description": "Paginated lists"
+        },
+        "fileUploads": {
+          "type": "boolean",
+          "description": "File upload capability"
+        },
+        "notifications": {
+          "type": "boolean",
+          "description": "Notification system"
+        },
+        "analytics": {
+          "type": "boolean",
+          "description": "Analytics and reporting"
+        },
+        "scheduling": {
+          "type": "boolean",
+          "description": "Scheduling and calendar features"
+        },
+        "logging": {
+          "type": "boolean",
+          "description": "Application logging"
+        }
+      }
+    },
+    "entityOverview": {
+      "type": "object",
+      "description": "High-level entity relationship summary grouped by domain concern. Drives types.yml generation.",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "type": "array",
+          "description": "Group of related entities (e.g., core, engagement, community)",
+          "items": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 1,
+            "patternProperties": {
+              "^[A-Z][A-Za-z0-9_]*$": {
+                "type": "string",
+                "description": "Entity name (PascalCase) mapped to a description of its purpose and relationships"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "accessPatterns": {
+      "type": "object",
+      "description": "Access control patterns describing who can see/do what. Drives roles.yml generation.",
+      "patternProperties": {
+        "^[a-zA-Z][a-zA-Z0-9_]*$": {
+          "type": "array",
+          "description": "Access level (e.g., public, authenticated, instructor, admin) mapped to permitted actions",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "database": {
+      "type": "object",
+      "description": "Database configuration",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "mongodb",
+            "postgresql",
+            "mysql"
+          ],
+          "description": "Database engine"
+        },
+        "name": {
+          "type": "string",
+          "description": "Database name"
+        }
+      }
+    }
+  }
+}

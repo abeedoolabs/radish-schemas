@@ -1,5 +1,5 @@
 // Main entry point for @radish/schemas
-export { typesSchema, rolesSchema, getSchema } from './schemas/index.js';
+export { typesSchema, rolesSchema, appSchema, getSchema } from './schemas/index.js';
 export {
   validateBlueprint,
   getSchemas,
@@ -8,6 +8,7 @@ export {
 } from './validators/index.js';
 export {
   getSchemaPrompt,
+  getAppPrompt,
   buildPrompt,
   getSchemaForPrompt
 } from './prompts/index.js';
