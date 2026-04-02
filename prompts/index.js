@@ -30,13 +30,23 @@ export function getAppPrompt() {
 
 /**
  * Build a complete prompt with user description injected
- * @param {'schema' | 'app'} promptType - Which prompt template to use
+ * @param {'app' | 'types' | 'roles'} promptType - Blueprint type to generate
  * @param {string} description - User's app description
  * @returns {string} Complete prompt with description injected
  */
 export function buildPrompt(promptType, description) {
-  const basePrompt = promptType === 'app' ? getAppPrompt() : getSchemaPrompt();
-  return basePrompt.replace('{{USER_DESCRIPTION}}', description);
+  const prompts = {
+    app: getAppPrompt,
+    types: getSchemaPrompt,   // types and roles share a prompt (generated together)
+    roles: getSchemaPrompt
+  };
+
+  const getPrompt = prompts[promptType];
+  if (!getPrompt) {
+    throw new Error(`Unknown prompt type: ${promptType}. Available: ${Object.keys(prompts).join(', ')}`);
+  }
+
+  return getPrompt().replace('{{USER_DESCRIPTION}}', description);
 }
 
 /**

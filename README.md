@@ -84,11 +84,11 @@ console.log(appSchema);
 ```javascript
 import { buildPrompt } from '@radish/schemas/prompts';
 
-// Build a prompt for types/roles generation
-const schemaPrompt = buildPrompt('schema', 'A blog with posts and comments');
-
 // Build a prompt for app blueprint generation
 const appPrompt = buildPrompt('app', 'A blog with posts and comments');
+
+// Build a prompt for types/roles generation
+const typesPrompt = buildPrompt('types', 'A blog with posts and comments');
 ```
 
 ## Package Structure
@@ -219,7 +219,7 @@ Gets the AI prompt template for app blueprint generation.
 Builds a complete prompt with user description injected.
 
 - **Parameters:**
-  - `promptType` ('schema' | 'app'): Which prompt template to use
+  - `promptType` ('app' | 'types' | 'roles'): Blueprint type to generate
   - `description` (string): User's app description
 - **Returns:** `string` - Complete prompt
 
