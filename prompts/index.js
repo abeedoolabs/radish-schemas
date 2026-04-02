@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 /**
- * Get the AI schema generation prompt template
+ * Get the AI schema generation prompt template (types + roles)
  * @returns {string} Prompt markdown content
  */
 export function getSchemaPrompt() {
@@ -29,19 +29,24 @@ export function getAppPrompt() {
 }
 
 /**
- * Build a complete prompt with user description and schema
+ * Build a complete prompt with user description injected
+ * @param {'app' | 'types' | 'roles'} promptType - Blueprint type to generate
  * @param {string} description - User's app description
- * @param {object} schema - JSON schema object
- * @returns {string} Complete prompt
+ * @returns {string} Complete prompt with description injected
  */
-export function buildPrompt(description, schema) {
-  const basePrompt = getSchemaPrompt();
+export function buildPrompt(promptType, description) {
+  const prompts = {
+    app: getAppPrompt,
+    types: getSchemaPrompt,   // types and roles share a prompt (generated together)
+    roles: getSchemaPrompt
+  };
 
-  // The prompt template uses placeholders that can be replaced
-  // or the schema can be appended as context
-  return basePrompt
-    .replace('{{USER_DESCRIPTION}}', description)
-    .replace('{{SCHEMA_JSON}}', JSON.stringify(schema, null, 2));
+  const getPrompt = prompts[promptType];
+  if (!getPrompt) {
+    throw new Error(`Unknown prompt type: ${promptType}. Available: ${Object.keys(prompts).join(', ')}`);
+  }
+
+  return getPrompt().replace('{{USER_DESCRIPTION}}', description);
 }
 
 /**

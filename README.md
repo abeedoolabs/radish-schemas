@@ -2,6 +2,8 @@
 
 Shared JSON schemas, validators, and AI prompts for the Radish CLI ecosystem.
 
+**All blueprints use JSON as the source of truth.** YAML rendering is available as a display utility.
+
 ## Installation
 
 ```bash
@@ -22,36 +24,45 @@ npm install @radish/schemas
 ```javascript
 import { validateBlueprint, formatValidationErrors } from '@radish/schemas';
 import { readFileSync } from 'fs';
-import yaml from 'yaml';
 
-const blueprintYaml = yaml.parse(readFileSync('types.yml', 'utf8'));
+const blueprint = JSON.parse(readFileSync('types.json', 'utf8'));
 
-const result = validateBlueprint(blueprintYaml, 'types');
+const result = validateBlueprint(blueprint, 'types');
 
 if (result.valid) {
-  console.log('✅ Blueprint is valid');
+  console.log('Blueprint is valid');
 } else {
-  console.error('❌ Validation errors:');
   console.error(formatValidationErrors(result.errors));
 }
 ```
 
-### Validating App Blueprints
+### Validating from Raw JSON Strings
 
 ```javascript
-import { validateBlueprint, formatValidationErrors } from '@radish/schemas';
-import { readFileSync } from 'fs';
-import yaml from 'yaml';
+import { validateFromJSON } from '@radish/schemas';
 
-const appBlueprint = yaml.parse(readFileSync('app.yml', 'utf8'));
-
-const result = validateBlueprint(appBlueprint, 'app');
+// Parse and validate in one step - useful for AI-generated output
+const result = validateFromJSON(aiResponseString, 'app');
 
 if (result.valid) {
-  console.log('App blueprint is valid');
+  console.log('Valid!', result.data); // Parsed object available
 } else {
-  console.error(formatValidationErrors(result.errors));
+  console.error(result.errors); // Includes JSON parse errors
 }
+```
+
+### YAML Display
+
+```javascript
+import { toYAML } from '@radish/schemas';
+
+const blueprint = JSON.parse(readFileSync('app.json', 'utf8'));
+const yamlView = toYAML(blueprint);
+console.log(yamlView);
+// version: 1
+// app:
+//   name: MyApp
+//   description: My application
 ```
 
 ### Getting Schemas
@@ -61,9 +72,6 @@ import { getSchemas, typesSchema, rolesSchema, appSchema } from '@radish/schemas
 
 // Get all schemas
 const schemas = getSchemas();
-console.log(schemas.types);
-console.log(schemas.roles);
-console.log(schemas.app);
 
 // Or import directly
 console.log(typesSchema);
@@ -74,19 +82,13 @@ console.log(appSchema);
 ### AI Prompts
 
 ```javascript
-import { getSchemaPrompt, getAppPrompt, buildPrompt } from '@radish/schemas/prompts';
+import { buildPrompt } from '@radish/schemas/prompts';
 
-// Get the data layer prompt template
-const schemaTemplate = getSchemaPrompt();
+// Build a prompt for app blueprint generation
+const appPrompt = buildPrompt('app', 'A blog with posts and comments');
 
-// Get the app blueprint prompt template
-const appTemplate = getAppPrompt();
-
-// Build a prompt with user description
-const prompt = buildPrompt(
-  'A blog platform with posts, comments, and users',
-  typesSchema
-);
+// Build a prompt for types/roles generation
+const typesPrompt = buildPrompt('types', 'A blog with posts and comments');
 ```
 
 ## Package Structure
@@ -105,11 +107,31 @@ const prompt = buildPrompt(
 └── index.js          # Main exports
 ```
 
+## Blueprint Types
+
+### types.json
+Data layer entity definitions - fields, relationships, indexes, filters.
+
+### roles.json
+Role and permission definitions for access control.
+
+### app.json
+Application-level blueprint (master document) including:
+- **app** - Name, description, domain, tags
+- **audience** - User personas (primary, secondary, admin)
+- **workflows** - Core user journeys with actors
+- **categories** - Content taxonomy
+- **style** - Branding and UI hints
+- **features** - Feature flags (auth, roles, api, search, etc.)
+- **entityOverview** - High-level entity descriptions grouped by domain concern
+- **accessPatterns** - Who can do what, by access level
+- **database** - Database configuration
+
 ## Version Compatibility
 
 ### Current Version
 
-- **Package Version:** `@radish/schemas@1.1.0`
+- **Package Version:** `@radish/schemas@1.2.0`
 - **Blueprint Spec Version:** `1`
 - **Minimum CLI Version:** `radish-cli@0.1.0`
 
@@ -121,8 +143,6 @@ const prompt = buildPrompt(
 - **Minor version bumps** (e.g., 1.0 → 1.1) add **backward-compatible features**
 - **Patch version bumps** (e.g., 1.0.0 → 1.0.1) include **bug fixes and improvements**
 
-**Important:** All `1.x` releases support blueprint spec version `1`. When blueprint format changes in a breaking way, both the package major version and spec version will increment together.
-
 For detailed versioning strategy, see [VERSIONING-STRATEGY.md](./VERSIONING-STRATEGY.md).
 
 ### Using VERSIONING Metadata
@@ -130,15 +150,10 @@ For detailed versioning strategy, see [VERSIONING-STRATEGY.md](./VERSIONING-STRA
 ```javascript
 import { VERSIONING } from '@radish/schemas';
 
-console.log(VERSIONING.packageVersion);           // "1.1.0"
+console.log(VERSIONING.packageVersion);           // "1.2.0"
 console.log(VERSIONING.currentSpecVersion);       // 1
 console.log(VERSIONING.supportedSpecVersions);    // [1]
 console.log(VERSIONING.minCliVersion);            // "0.1.0"
-
-// Validate compatibility
-if (!VERSIONING.supportedSpecVersions.includes(blueprintSpecVersion)) {
-  throw new Error(`Blueprint spec version ${blueprintSpecVersion} is not supported`);
-}
 ```
 
 ## API Reference
@@ -147,12 +162,29 @@ if (!VERSIONING.supportedSpecVersions.includes(blueprintSpecVersion)) {
 
 #### `validateBlueprint(data, type)`
 
-Validates data against a schema.
+Validates a parsed object against a schema.
 
 - **Parameters:**
-  - `data` (any): Parsed YAML/JSON data
+  - `data` (object): Parsed JSON data
   - `type` ('types' | 'roles' | 'app'): Schema type
 - **Returns:** `{ valid: boolean, errors: Array }`
+
+#### `validateFromJSON(jsonString, type)`
+
+Parses a JSON string and validates against a schema.
+
+- **Parameters:**
+  - `jsonString` (string): Raw JSON string
+  - `type` ('types' | 'roles' | 'app'): Schema type
+- **Returns:** `{ valid: boolean, errors: Array, data: object|null }`
+
+#### `toYAML(data)`
+
+Converts a blueprint object to YAML string for display purposes.
+
+- **Parameters:**
+  - `data` (object): Blueprint data
+- **Returns:** `string` - YAML-formatted string
 
 #### `formatValidationErrors(errors)`
 
@@ -182,29 +214,22 @@ Gets the AI prompt template for app blueprint generation.
 
 - **Returns:** `string` - Prompt markdown
 
-#### `buildPrompt(description, schema)`
+#### `buildPrompt(promptType, description)`
 
-Builds a complete AI prompt.
+Builds a complete prompt with user description injected.
 
 - **Parameters:**
-  - `description` (string): User's description
-  - `schema` (object): JSON schema
+  - `promptType` ('app' | 'types' | 'roles'): Blueprint type to generate
+  - `description` (string): User's app description
 - **Returns:** `string` - Complete prompt
 
-### Schemas
+#### `getSchemaForPrompt(type)`
 
-#### `appSchema`
+Gets a schema as a JSON string for inclusion in prompts.
 
-The app blueprint JSON Schema. Validates application-level metadata including:
-- **app** - Name, description, domain, tags
-- **audience** - User personas (primary, secondary, admin)
-- **workflows** - Core user journeys with actors
-- **categories** - Content taxonomy
-- **style** - Branding and UI hints
-- **features** - Feature flags (auth, roles, api, search, etc.)
-- **entityOverview** - High-level entity descriptions grouped by domain concern
-- **accessPatterns** - Who can do what, by access level
-- **database** - Database configuration
+- **Parameters:**
+  - `type` ('types' | 'roles' | 'app'): Schema type
+- **Returns:** `string` - Stringified JSON schema
 
 ## License
 

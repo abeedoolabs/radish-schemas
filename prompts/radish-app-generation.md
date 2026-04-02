@@ -1,78 +1,82 @@
 # AI App Blueprint Generation Prompt Template
 
-You are an expert application architect. Generate a YAML app blueprint based on the user's description.
+You are an expert application architect. Generate a JSON app blueprint based on the user's description.
 
 ## Purpose
 
-The app blueprint is the **master document** for a Radish application. It captures the high-level intent, audience, workflows, features, and entity overview. Other generators (types.yml, roles.yml, UI layer) use this blueprint as their primary input.
+The app blueprint is the **master document** for a Radish application. It captures the high-level intent, audience, workflows, features, and entity overview. Other generators (types.json, roles.json, UI layer) use this blueprint as their primary input.
 
 ## IMPORTANT: Output Format
 
-1. **Return ONLY valid YAML** - No markdown, explanations, or code blocks
+1. **Return ONLY valid JSON** - No markdown, explanations, or code blocks
 2. **Use this exact top-level structure**:
 
-```yaml
-version: 1
-
-app:
-  name: "AppName"
-  displayName: "App Display Name"
-  description: "Full description of the application"
-  version: "0.1.0"
-  domain: "business-domain"
-  tags: [tag1, tag2, tag3]
-
-audience:
-  primary: "Primary user persona description"
-  secondary: "Secondary user persona description"
-  admin: "Admin user persona description"
-
-workflows:
-  - name: "Workflow Name"
-    actor: persona
-    description: "What the user does step by step"
-
-categories:
-  - name: "Category Name"
-    subcategories: [Sub1, Sub2, Sub3]
-
-style:
-  theme: "radish-admin"
-  tone: "professional but approachable"
-  palette: "description of color palette"
-  typography: "font and spacing preferences"
-  layout: "layout style description"
-  icons: "icon style description"
-  imagery: "imagery style description"
-
-features:
-  auth: true
-  roles: true
-  adminPanel: true
-  api: true
-  search: true
-  pagination: true
-  fileUploads: false
-  notifications: false
-  analytics: false
-  scheduling: false
-  logging: true
-
-entityOverview:
-  groupName:
-    - EntityName: "Description of entity purpose and relationships"
-
-accessPatterns:
-  public:
-    - "Action anyone can do"
-  authenticated:
-    - "Action logged-in users can do"
-  admin:
-    - "Action admins can do"
-
-database:
-  type: "mongodb"
-  name: "appname"
+```json
+{
+  "version": 1,
+  "app": {
+    "name": "AppName",
+    "displayName": "App Display Name",
+    "description": "Full description of the application",
+    "version": "0.1.0",
+    "domain": "business-domain",
+    "tags": ["tag1", "tag2", "tag3"]
+  },
+  "audience": {
+    "primary": "Primary user persona description",
+    "secondary": "Secondary user persona description",
+    "admin": "Admin user persona description"
+  },
+  "workflows": [
+    {
+      "name": "Workflow Name",
+      "actor": "persona",
+      "description": "What the user does step by step"
+    }
+  ],
+  "categories": [
+    {
+      "name": "Category Name",
+      "subcategories": ["Sub1", "Sub2", "Sub3"]
+    }
+  ],
+  "style": {
+    "theme": "radish-admin",
+    "tone": "professional but approachable",
+    "palette": "description of color palette",
+    "typography": "font and spacing preferences",
+    "layout": "layout style description",
+    "icons": "icon style description",
+    "imagery": "imagery style description"
+  },
+  "features": {
+    "auth": true,
+    "roles": true,
+    "adminPanel": true,
+    "api": true,
+    "search": true,
+    "pagination": true,
+    "fileUploads": false,
+    "notifications": false,
+    "analytics": false,
+    "scheduling": false,
+    "logging": true
+  },
+  "entityOverview": {
+    "groupName": [
+      { "EntityName": "Description of entity purpose and relationships" }
+    ]
+  },
+  "accessPatterns": {
+    "public": ["Action anyone can do"],
+    "authenticated": ["Action logged-in users can do"],
+    "admin": ["Action admins can do"]
+  },
+  "database": {
+    "type": "mongodb",
+    "name": "appname"
+  }
+}
 ```
 
 ## Section Details
@@ -105,11 +109,12 @@ The most important section for driving UI generation. Describe **what users actu
 - Think about CRUD operations but describe them as user goals
 
 **Example:**
-```yaml
-workflows:
-  - name: "Project Planning"
-    actor: manager
-    description: "Create a new project, define milestones and tasks, assign team members, set deadlines, track progress through kanban board"
+```json
+{
+  "name": "Project Planning",
+  "actor": "manager",
+  "description": "Create a new project, define milestones and tasks, assign team members, set deadlines, track progress through kanban board"
+}
 ```
 
 ### categories (optional)
@@ -144,28 +149,31 @@ Boolean flags for application capabilities. These drive which generators and tem
 | logging | Application event logging |
 
 ### entityOverview
-High-level entity descriptions grouped by domain concern. This drives `types.yml` generation.
+High-level entity descriptions grouped by domain concern. This drives types.json generation.
 
 **Guidelines:**
 - Group entities by domain concern (core, engagement, community, etc.)
 - Use PascalCase for entity names
 - Describe purpose, key relationships, and ownership
 - Mention which entities are "owned by" users
-- Don't define fields here — that's for types.yml
+- Don't define fields here — that's for types.json
 
 **Example:**
-```yaml
-entityOverview:
-  core:
-    - Project: "Top-level container. Has tasks and milestones. Owned by creator."
-    - Task: "Work item within a project. Assigned to team members. Has status, priority, due date."
-  collaboration:
-    - Comment: "Threaded discussion on tasks or projects."
-    - Activity: "Audit log of actions taken on entities."
+```json
+{
+  "core": [
+    { "Project": "Top-level container. Has tasks and milestones. Owned by creator." },
+    { "Task": "Work item within a project. Assigned to team members. Has status, priority, due date." }
+  ],
+  "collaboration": [
+    { "Comment": "Threaded discussion on tasks or projects." },
+    { "Activity": "Audit log of actions taken on entities." }
+  ]
+}
 ```
 
 ### accessPatterns
-Who can do what, organized by access level. This drives `roles.yml` generation.
+Who can do what, organized by access level. This drives roles.json generation.
 
 **Guidelines:**
 - Use clear access levels: public, authenticated, role-specific names, admin
@@ -190,7 +198,7 @@ Database configuration for the project.
 - Define clear access patterns
 
 ### DON'T:
-- Don't define individual fields — that's for types.yml
+- Don't define individual fields — that's for types.json
 - Don't specify routes or pages — that's for the UI layer
 - Don't include implementation details (API endpoints, database queries)
 - Don't create entities for built-in types (User, Profile, Role, Permission, ApiKey, Setting)
@@ -220,19 +228,32 @@ You MUST respond with ONLY a valid JSON object in this EXACT format:
 
 ```json
 {
-  "app": "version: 1\napp:\n  name: AppName\n  ..."
+  "app": {
+    "version": 1,
+    "app": {
+      "name": "AppName",
+      "description": "Full description..."
+    },
+    "audience": { ... },
+    "workflows": [ ... ],
+    "features": { ... },
+    "entityOverview": { ... },
+    "accessPatterns": { ... },
+    "database": { ... }
+  }
 }
 ```
 
 **CRITICAL REQUIREMENTS**:
 1. Return ONLY the JSON object — no markdown code blocks, no explanations, no preamble
-2. The `app` value must be a complete YAML string
-3. All YAML must be properly escaped in JSON strings (use \n for newlines)
-4. The YAML must start with `version: 1`
+2. The `app` value must be a complete JSON object (NOT a string)
+3. Must include `"version": 1` at the top level of the app object
+4. All keys and string values must be properly quoted
 
 **Common Mistakes to AVOID**:
 - Wrapping response in markdown ```json...``` blocks
 - Including explanatory text before or after the JSON
-- Defining individual entity fields (save for types.yml)
+- Defining individual entity fields (save for types.json)
 - Including built-in entities (User, Role, etc.) in entityOverview
 - Using implementation-specific details instead of high-level descriptions
+- Returning YAML strings instead of JSON objects

@@ -40,9 +40,9 @@ The UI Layer extends Radish CLI to generate user-facing application pages from h
 
 ## Schema Structure
 
-### File: `ui.yml` (or could be in same file as types/roles)
+### File: `ui.json` (or could be in same file as types/roles)
 
-```yaml
+```json
 version: 1
 
 # App metadata
@@ -127,7 +127,7 @@ Landing page hero section with title/subtitle.
 - `subtitle` (string, optional)
 
 **Example:**
-```yaml
+```json
 - type: 'hero'
   title: 'Welcome to {app.name}'
   subtitle: 'Build amazing apps'
@@ -137,13 +137,13 @@ Landing page hero section with title/subtitle.
 Display a list/table of entities. Automatically introspects entity metadata from datalayer.
 
 **Properties:**
-- `entity` (string, required) - Entity name from types.yml
+- `entity` (string, required) - Entity name from types.json
 - `display` (string) - `table`, `grid`, `preview` (default: `table`)
 - `limit` (number, optional) - Max items to display
 - `filter` (object, optional) - Filter by field/value
 
 **Example:**
-```yaml
+```json
 - type: 'entity-list'
   entity: 'Post'
   display: 'table'
@@ -162,7 +162,7 @@ Display single entity with all fields. Introspects entity metadata.
 - `entity` (string, required) - Entity name
 
 **Example:**
-```yaml
+```json
 - type: 'entity-detail'
   entity: 'Post'
 ```
@@ -180,7 +180,7 @@ Create/edit form for entity. Introspects entity metadata for fields and validati
 - `action` (string) - `create`, `edit` (default: `create`)
 
 **Example:**
-```yaml
+```json
 - type: 'entity-form'
   entity: 'Post'
   action: 'create'
@@ -195,10 +195,10 @@ Create/edit form for entity. Introspects entity metadata for fields and validati
 
 ## Metadata Introspection
 
-The generator reads entity definitions from `types.yml` to auto-generate UI:
+The generator reads entity definitions from `types.json` to auto-generate UI:
 
 **Datalayer Definition:**
-```yaml
+```json
 Post:
   plural: 'posts'
   fields:
@@ -223,7 +223,7 @@ Post:
 
 Keep layouts simple for MVP - just boolean flags:
 
-```yaml
+```json
 layout:
   header: true      # App header with logo/branding
   navigation: true  # Main navigation menu
@@ -240,7 +240,7 @@ layout:
 ## Route Patterns
 
 ### Static Routes
-```yaml
+```json
 - path: '/'
   page: 'home'
 
@@ -249,7 +249,7 @@ layout:
 ```
 
 ### Dynamic Routes (SvelteKit style)
-```yaml
+```json
 - path: '/posts/[id]'
   page: 'post-detail'
 
@@ -259,7 +259,7 @@ layout:
 
 **Parameter Interpolation:**
 Content blocks can reference route parameters:
-```yaml
+```json
 content:
   - type: 'entity-detail'
     entity: 'Post'
@@ -282,8 +282,8 @@ More sophisticated view modes (Drupal-style) deferred to future versions.
 
 ## Example: Complete Blog UI
 
-**ui.yml:**
-```yaml
+**ui.json:**
+```json
 version: 1
 
 app:
@@ -382,8 +382,8 @@ src/
 ```
 
 **Generator Workflow:**
-1. Parse `ui.yml`
-2. Read entity metadata from `types.yml`
+1. Parse `ui.json`
+2. Read entity metadata from `types.json`
 3. For each route, create SvelteKit page files
 4. Generate layout components
 5. Generate content block components
@@ -401,7 +401,7 @@ Explore patterns like:
 - Separate generated library vs user code
 
 ### View Modes (Drupal-inspired)
-```yaml
+```json
 Post:
   viewModes:
     full:
@@ -417,7 +417,7 @@ Post:
 ```
 
 ### Form Widgets
-```yaml
+```json
 Post:
   fields:
     content:
@@ -444,7 +444,7 @@ Post:
 
 ### 1. Layout Structure
 **Current:** Simple booleans
-```yaml
+```json
 layout:
   header: true
   navigation: true
@@ -452,7 +452,7 @@ layout:
 ```
 
 **Alternative:** More structured
-```yaml
+```json
 layout:
   sections:
     - type: 'header'
@@ -504,7 +504,7 @@ A successful v1 implementation enables:
 ## Timeline & Phases
 
 ### Phase 1: Schema Design (Current)
-- ✅ Define ui.yml structure
+- ✅ Define ui.json structure
 - ✅ Document content block types
 - Create JSON schema validation
 - Write AI prompt for UI generation
@@ -542,8 +542,8 @@ A successful v1 implementation enables:
 1. **Generator location:** `src/generators/ui-layer/`
 2. **Template engine:** Handlebars (consistent with datalayer)
 3. **Template location:** `src/generators/ui-layer/templates/sveltekit/`
-4. **Metadata access:** Import types.yml alongside ui.yml
-5. **Validation:** Use `@radish/schemas` for ui.yml validation
+4. **Metadata access:** Import types.json alongside ui.json
+5. **Validation:** Use `@radish/schemas` for ui.json validation
 
 ---
 

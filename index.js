@@ -2,6 +2,8 @@
 export { typesSchema, rolesSchema, appSchema, getSchema } from './schemas/index.js';
 export {
   validateBlueprint,
+  validateFromJSON,
+  toYAML,
   getSchemas,
   formatValidationErrors,
   validators
