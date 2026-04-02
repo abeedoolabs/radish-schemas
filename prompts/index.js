@@ -7,23 +7,46 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 /**
- * Get the AI schema generation prompt template (types + roles)
+ * Get the AI types blueprint generation prompt
  * @returns {string} Prompt markdown content
  */
-export function getSchemaPrompt() {
+export function getTypesPrompt() {
   return readFileSync(
-    join(__dirname, 'radish-schema-generation.md'),
+    join(__dirname, 'radish-types-generation.md'),
     'utf-8'
   );
 }
 
 /**
- * Get the AI app blueprint generation prompt template
+ * Get the AI roles blueprint generation prompt
+ * @returns {string} Prompt markdown content
+ */
+export function getRolesPrompt() {
+  return readFileSync(
+    join(__dirname, 'radish-roles-generation.md'),
+    'utf-8'
+  );
+}
+
+/**
+ * Get the AI app blueprint generation prompt
  * @returns {string} Prompt markdown content
  */
 export function getAppPrompt() {
   return readFileSync(
     join(__dirname, 'radish-app-generation.md'),
+    'utf-8'
+  );
+}
+
+/**
+ * @deprecated Use getTypesPrompt() or getRolesPrompt() instead.
+ * Returns the combined types+roles prompt for backward compatibility.
+ * @returns {string} Prompt markdown content
+ */
+export function getSchemaPrompt() {
+  return readFileSync(
+    join(__dirname, 'radish-schema-generation.md'),
     'utf-8'
   );
 }
@@ -37,8 +60,8 @@ export function getAppPrompt() {
 export function buildPrompt(promptType, description) {
   const prompts = {
     app: getAppPrompt,
-    types: getSchemaPrompt,   // types and roles share a prompt (generated together)
-    roles: getSchemaPrompt
+    types: getTypesPrompt,
+    roles: getRolesPrompt
   };
 
   const getPrompt = prompts[promptType];

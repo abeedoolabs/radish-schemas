@@ -9,8 +9,10 @@ export {
   validators
 } from './validators/index.js';
 export {
-  getSchemaPrompt,
+  getTypesPrompt,
+  getRolesPrompt,
   getAppPrompt,
+  getSchemaPrompt,  // deprecated: use getTypesPrompt/getRolesPrompt
   buildPrompt,
   getSchemaForPrompt
 } from './prompts/index.js';
