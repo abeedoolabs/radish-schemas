@@ -1,84 +1,65 @@
 # @radish/schemas - Current Status
 
-## ✅ Completed
-
-- [x] Package structure created
-- [x] Schemas copied from radish-cli
-- [x] Validators module with AJV
-- [x] Prompts module
-- [x] Tests (all passing)
-- [x] Documentation (README, SETUP, MIGRATION)
-- [x] GitLab CI/CD configuration
-- [x] Context files for AI assistants (CLAUDE.md, AI_CONTEXT.md)
-- [x] Git repository initialized
-- [x] Initial commits made
-
-## 📋 Next Steps
-
-### 1. Push to GitLab
-```bash
-git remote add origin <your-gitlab-repo-url>
-git push -u origin main
-```
-
-### 2. Configure GitLab Package Registry
-
-Update `package.json`:
-```json
-{
-  "publishConfig": {
-    "@radish:registry": "https://gitlab.your-domain.com/api/v4/projects/YOUR_PROJECT_ID/packages/npm/"
-  }
-}
-```
-
-### 3. Publish First Version
-```bash
-npm version 1.0.0
-git push --follow-tags
-# GitLab CI will publish automatically
-```
-
-### 4. Migrate radish-cli
-- See MIGRATION.md
-- Install package: `npm install @radish/schemas`
-- Update imports in `src/commands/validate.mjs`
-- Test validation: `radish-cli validate ./blueprints/types.yml`
-
-### 5. Migrate radish-wizard
-- See MIGRATION.md
-- Install package: `npm install @radish/schemas`
-- Update `src/routes/+page.server.ts`
-- Update prompt loading
-- Test wizard generation flow
-
-## 📦 Package Info
+## Package Info
 
 - **Name:** `@radish/schemas`
-- **Version:** 1.0.0 (to be published)
-- **Location:** `/Users/ctmeece/Projects/radish-schemas`
-- **Consumers:** radish-cli, radish-wizard
-- **Registry:** GitLab private npm registry
+- **Version:** 1.2.0
+- **Registry:** GitLab private npm registry (project ID: 6)
+- **Instance:** gitlab.mini1.abeedoo.com
+- **Blueprint Format:** JSON (source of truth), YAML (display only)
 
-## 🔗 Related Projects
+## Published Versions
 
-- **radish-cli:** `/Users/ctmeece/Projects/radish-cli`
-- **radish-wizard:** `/Users/ctmeece/Projects/radish-cli/wizard`
+- **v1.0.0** - Initial release (types, roles schemas)
+- **v1.1.0** - VERSIONING metadata, required version field, raw JSON exports
+- **v1.2.0** - App schema, JSON-first pipeline, validateFromJSON, toYAML, prompt updates
 
-## 📚 Documentation
+## Completed
 
-- `README.md` - Package usage and API
-- `SETUP.md` - GitLab publishing guide
-- `MIGRATION.md` - Consumer migration guide
-- `CLAUDE.md` - Claude Code context
-- `AI_CONTEXT.md` - AI assistant context
-- `STATUS.md` - This file
+- [x] Package structure and module system
+- [x] types.schema.json - Data layer entity/field schema
+- [x] roles.schema.json - Roles and permissions schema
+- [x] app.schema.json - Application blueprint schema
+- [x] AJV validators (validateBlueprint, validateFromJSON, formatValidationErrors)
+- [x] toYAML display utility (zero dependencies)
+- [x] AI prompt templates (types/roles and app)
+- [x] buildPrompt() with extensible type system (app, types, roles)
+- [x] VERSIONING metadata export
+- [x] Two-version system (package version + blueprint spec version)
+- [x] GitLab CI/CD automated publishing
+- [x] Deploy token for consumer authentication
+- [x] Tests (10 tests, all passing)
+- [x] JSON-first pipeline (YAML removed as dependency)
+- [x] Documentation (README, SETUP, MIGRATION, VERSIONING-STRATEGY)
+- [x] UI Layer strategy document
 
-## 🧪 Testing
+## Next Steps
+
+### Short Term
+- [ ] Migrate @radish/cli to use @radish/schemas@1.2.0
+- [ ] Migrate @radish/wizard to use @radish/schemas@1.2.0
+- [ ] Create ui.schema.json for UI Layer blueprints
+- [ ] Create UI Layer AI prompt template
+
+### Medium Term
+- [ ] Implement spec version compatibility checking in radish-cli
+- [ ] Add component schema for reusable UI components
+- [ ] Add view modes to data layer schema (Drupal-inspired)
+
+### Long Term
+- [ ] Multi-version spec support
+- [ ] Migration tooling for spec version upgrades
+- [ ] Regen-safe customization strategy
+
+## Consumer Projects
+
+| Project | Package | Status |
+|---------|---------|--------|
+| @radish/cli | @radish/schemas | Dependency added, migration in progress |
+| @radish/wizard | @radish/schemas | Dependency added, migration in progress |
+
+## Testing
 
 ```bash
-node test.js  # Run validation tests
-npm pack      # Test local install
+node test.js  # Run all 10 validation tests
 ```
-
-All tests currently passing ✅

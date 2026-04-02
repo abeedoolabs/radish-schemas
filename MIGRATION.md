@@ -1,23 +1,66 @@
-# Migration Guide: Using @radish/schemas in Existing Projects
+# Migration Guide
 
-## Overview
+## YAML to JSON Migration
 
-This package extracts shared schemas, validators, and prompts that were previously duplicated across `radish-cli` and `wizard`.
+As of v1.2.0, Radish uses **JSON as the source of truth** for all blueprint files. YAML is available only as a display utility.
 
-## For radish-cli
+### What Changed
 
-### 1. Install the package
+| Before | After |
+|--------|-------|
+| `.types.yml` | `.types.json` |
+| `.roles.yml` | `.roles.json` |
+| `.app.yml` | `.app.json` |
+| AI returns YAML strings in JSON | AI returns raw JSON objects |
+| `yaml` dependency required | No YAML dependency |
+| `buildPrompt(description, schema)` | `buildPrompt('types', description)` |
 
-```bash
-cd /Users/ctmeece/Projects/radish-cli
-npm install @radish/schemas
+### Code Changes
+
+**Validation:**
+```javascript
+// Before
+import yaml from 'yaml';
+const data = yaml.parse(readFileSync('types.yml', 'utf8'));
+const result = validateBlueprint(data, 'types');
+
+// After
+const data = JSON.parse(readFileSync('types.json', 'utf8'));
+const result = validateBlueprint(data, 'types');
+
+// Or validate from raw JSON string in one step
+const result = validateFromJSON(readFileSync('types.json', 'utf8'), 'types');
 ```
 
-### 2. Update validate command
-
-**Before:**
+**AI Prompt Building:**
 ```javascript
-// src/commands/validate.mjs
+// Before
+import { buildPrompt } from '@radish/schemas/prompts';
+const prompt = buildPrompt(description, schema);
+
+// After
+const prompt = buildPrompt('types', description);
+const appPrompt = buildPrompt('app', description);
+```
+
+**Display as YAML (optional):**
+```javascript
+import { toYAML } from '@radish/schemas';
+const yamlView = toYAML(blueprintData);
+```
+
+## For @radish/cli
+
+### Install
+
+```bash
+npm install @radish/schemas@^1.2.0
+```
+
+### Update Validation
+
+```javascript
+// Before
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import typesSchema from '../schemas/types.schema.json';
@@ -25,11 +68,8 @@ import typesSchema from '../schemas/types.schema.json';
 const ajv = new Ajv({ allErrors: true, strict: false });
 addFormats(ajv);
 const validate = ajv.compile(typesSchema);
-```
 
-**After:**
-```javascript
-// src/commands/validate.mjs
+// After
 import { validateBlueprint, formatValidationErrors } from '@radish/schemas';
 
 const result = validateBlueprint(blueprintData, 'types');
@@ -38,134 +78,104 @@ if (!result.valid) {
 }
 ```
 
-### 3. Update any schema imports
+### Update Schema Imports
 
-**Before:**
 ```javascript
+// Before
 import typesSchema from './schemas/types.schema.json';
 import rolesSchema from './schemas/roles.schema.json';
+
+// After
+import { typesSchema, rolesSchema, appSchema } from '@radish/schemas';
 ```
 
-**After:**
+### Update AI Generation
+
 ```javascript
-import { typesSchema, rolesSchema } from '@radish/schemas';
+// Before
+import { readFileSync } from 'fs';
+const prompt = readFileSync('prompts/radish-schema-generation.md', 'utf-8');
+
+// After
+import { buildPrompt } from '@radish/schemas/prompts';
+const prompt = buildPrompt('types', userDescription);
+const appPrompt = buildPrompt('app', userDescription);
 ```
 
-### 4. Remove local schemas directory (optional)
+### Update Blueprint File Handling
 
-After confirming everything works:
+```javascript
+// Before - reading YAML files
+import yaml from 'yaml';
+const blueprint = yaml.parse(readFileSync('types.yml', 'utf8'));
+
+// After - reading JSON files
+const blueprint = JSON.parse(readFileSync('types.json', 'utf8'));
+```
+
+## For @radish/wizard
+
+### Install
+
 ```bash
-git rm -r schemas/
+npm install @radish/schemas@^1.2.0
 ```
 
-## For radish-wizard
+### Update Validation
 
-### 1. Install the package
-
-```bash
-cd /Users/ctmeece/Projects/radish-cli/wizard
-npm install @radish/schemas
-```
-
-### 2. Update server-side validation
-
-**Before:**
-```typescript
-// src/routes/+page.server.ts
+```javascript
+// Before
 import Ajv from 'ajv';
 import typesSchema from '../../schemas/types.schema.json';
 
 const ajv = new Ajv({ allErrors: true, strict: false });
 const validateTypes = ajv.compile(typesSchema);
-```
 
-**After:**
-```typescript
-// src/routes/+page.server.ts
-import { validateBlueprint, formatValidationErrors } from '@radish/schemas';
+// After
+import { validateFromJSON, formatValidationErrors } from '@radish/schemas';
 
-const result = validateBlueprint(typesYaml, 'types');
+// Validate AI-generated JSON directly
+const result = validateFromJSON(aiResponseString, 'types');
 if (!result.valid) {
-  return {
-    success: false,
-    error: formatValidationErrors(result.errors),
-    validationErrors: result.errors
-  };
+  return { error: formatValidationErrors(result.errors) };
 }
+const validatedData = result.data;
 ```
 
-### 3. Update AI prompt loading
+### Update Prompt Loading
 
-**Before:**
-```typescript
-// src/routes/+page.server.ts
+```javascript
+// Before
 import { readFileSync } from 'fs';
 const promptTemplate = readFileSync('src/prompts/radish-schema-generation.md', 'utf-8');
-```
 
-**After:**
-```typescript
-// src/routes/+page.server.ts
-import { getSchemaPrompt } from '@radish/schemas/prompts';
-
-const promptTemplate = getSchemaPrompt();
-```
-
-### 4. Clean up duplicate files
-
-After confirming everything works:
-```bash
-# Remove duplicate prompt file
-rm src/prompts/radish-schema-generation.md
+// After
+import { buildPrompt } from '@radish/schemas/prompts';
+const prompt = buildPrompt('app', userDescription);
 ```
 
 ## Testing After Migration
 
-### radish-cli
-
 ```bash
-cd /Users/ctmeece/Projects/radish-cli
+# Test validation
+node -e "
+import { validateFromJSON } from '@radish/schemas';
+const result = validateFromJSON('{\"version\":1,\"app\":{\"name\":\"Test\",\"description\":\"Test app\"}}', 'app');
+console.log(result.valid ? 'OK' : 'FAIL');
+"
 
-# Test validation command
-radish-cli validate /path/to/blueprint.yml
-
-# Test schema command
-radish-cli schema types
+# Test prompts
+node -e "
+import { buildPrompt } from '@radish/schemas/prompts';
+const prompt = buildPrompt('app', 'A blog');
+console.log(prompt.substring(0, 100));
+"
 ```
 
-### radish-wizard
+## Rollback
+
+If something breaks, pin to the previous version:
 
 ```bash
-cd /Users/ctmeece/Projects/radish-cli/wizard
-
-# Start wizard
-npm run dev
-
-# Test:
-# 1. Generate a blueprint
-# 2. Verify validation works
-# 3. Check for errors in console
-```
-
-## Benefits After Migration
-
-✅ **Single source of truth** - Schema updates happen in one place
-✅ **Version management** - Can lock to specific schema versions
-✅ **Independent updates** - Update schemas without touching CLI/wizard code
-✅ **Consistent validation** - Both projects use identical validation logic
-✅ **Easier testing** - Test schemas independently
-✅ **Smaller repos** - Remove duplicate files
-
-## Rollback Plan
-
-If something breaks:
-
-```bash
-# Revert package installation
-npm uninstall @radish/schemas
-
-# Restore from git
-git checkout -- schemas/
-git checkout -- src/commands/validate.mjs
-# etc.
+npm install @radish/schemas@1.1.0
 ```

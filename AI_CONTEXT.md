@@ -2,337 +2,147 @@
 
 ## What This Package Is
 
-A shared npm package that extracts JSON schemas, validators, and AI prompts from the Radish CLI ecosystem. Previously these files were duplicated across `radish-cli` and `radish-wizard`, causing maintenance issues and version drift.
+A shared npm package providing JSON schemas, validators, and AI prompts for the Radish CLI ecosystem. It is the single source of truth for blueprint validation and AI generation across all Radish projects.
 
 ## Why It Exists
 
-**Problem:** radish-cli and radish-wizard both need:
-1. JSON schemas to validate blueprint YAML files
-2. AJV validators to check schema compliance
-3. AI prompts to generate blueprints from natural language
+**Problem:** Multiple Radish projects (CLI, wizard) need identical schemas, validators, and prompts. Duplicating these causes version drift and maintenance burden.
 
-**Before:** These files were duplicated in both projects, leading to:
-- Schema changes required updates in two places
-- Validation logic could drift between projects
-- No versioning of schemas
-
-**After:** Single package published to private GitLab npm registry:
-- Update once, use everywhere
-- Semantic versioning for schema changes
-- Independent release cycle from CLI/wizard
+**Solution:** Single versioned package published to private GitLab npm registry.
 
 ## Current State
 
-**Status:** ✅ Package created, not yet published or consumed
+**Version:** 1.2.0 (published to GitLab registry)
+**Blueprint Format:** JSON (source of truth). YAML available as display utility only.
 
-**Completed:**
-- ✅ Package structure created
-- ✅ Schemas copied from radish-cli
-- ✅ Validators module created with AJV
-- ✅ Prompts module created
-- ✅ Tests written and passing
-- ✅ GitLab CI/CD configured
-- ✅ Documentation written (README, SETUP, MIGRATION)
-- ✅ Git repository initialized and committed
+## Architecture
 
-**Next Steps:**
-1. Push to GitLab
-2. Configure GitLab project ID and registry URL
-3. Publish first version (v1.0.0)
-4. Migrate radish-cli to use this package
-5. Migrate radish-wizard to use this package
-
-## Design Decisions
-
-### Why npm Package Instead of Git Submodule?
-
-**Git Submodule Approach:**
-- ❌ Requires `git submodule update` dance
-- ❌ Easy to get submodules out of sync
-- ❌ No versioning - always uses HEAD
-- ❌ Doesn't work well with npm install
-
-**npm Package Approach:**
-- ✅ Standard dependency management
-- ✅ Semantic versioning
-- ✅ Lock to specific versions
-- ✅ Works with npm install workflows
-- ✅ Can publish breaking changes safely
-
-### Why Private GitLab Registry Instead of Public npm?
-
-- Radish CLI is private/internal tooling
-- GitLab registry already available
-- No need for public npm account
-- Keep everything in GitLab ecosystem
-
-### Module Structure
-
-**Separate index files per directory:**
 ```
-schemas/index.js    - Exports schemas
-validators/index.js - Exports validators
-prompts/index.js    - Exports prompts
-index.js            - Re-exports everything
+@radish/schemas/
+├── schemas/                          # JSON Schema definitions
+│   ├── types.schema.json             # Data layer entities/fields
+│   ├── roles.schema.json             # Roles and permissions
+│   ├── app.schema.json               # Application blueprint (master document)
+│   └── index.js                      # Single schema loader (canonical)
+│
+├── validators/                       # Validation utilities
+│   └── index.js                      # validateBlueprint, validateFromJSON, toYAML
+│
+├── prompts/                          # AI prompt templates
+│   ├── radish-schema-generation.md   # Types/roles generation prompt
+│   ├── radish-app-generation.md      # App blueprint generation prompt
+│   └── index.js                      # buildPrompt, getSchemaPrompt, getAppPrompt
+│
+├── index.js                          # Main entry point - re-exports everything
+├── test.js                           # 10 validation tests
+└── package.json                      # v1.2.0, published to GitLab
 ```
 
-**Benefits:**
-- Tree-shaking support: `import { typesSchema } from '@radish/schemas/schemas'`
-- Partial imports: `import { validateBlueprint } from '@radish/schemas/validators'`
-- Clear separation of concerns
+## Key Design Decisions
 
-### Validation Approach
+### JSON-First Pipeline
+All blueprints use JSON throughout the entire pipeline. AI prompts request raw JSON output. No YAML parsing dependency. `toYAML()` is a zero-dependency display utility for human readability in UIs.
 
-**Uses AJV (Another JSON Validator):**
-- Industry standard for JSON Schema validation
-- Fast and widely used
-- Same library already used by radish-cli
+### Blueprint Types
+Three blueprint types, each with a schema, validator, and prompt:
 
-**Wrapper Functions:**
+| Type | File | Purpose |
+|------|------|---------|
+| `app` | app.schema.json | Master application document (audience, workflows, features, entity overview) |
+| `types` | types.schema.json | Data layer entities, fields, relationships, indexes |
+| `roles` | roles.schema.json | Roles, permissions, access control |
+
+### Two-Version System
+- **Package version** (npm semver): `@radish/schemas@1.2.0`
+- **Blueprint spec version**: `version: 1` in each blueprint
+- Package can evolve within major version without breaking blueprints
+- Breaking blueprint changes = major version bump + spec version bump
+
+### Schema Loading
+Schemas are loaded once in `schemas/index.js` and imported by validators and prompts. No duplicate file reads.
+
+### Extensible Prompt System
+`buildPrompt(type, description)` maps blueprint types to prompt templates:
 ```javascript
-validateBlueprint(data, type) // Returns { valid, errors }
-formatValidationErrors(errors) // Formats AJV errors for display
+buildPrompt('app', description)    // Uses radish-app-generation.md
+buildPrompt('types', description)  // Uses radish-schema-generation.md
+buildPrompt('roles', description)  // Uses radish-schema-generation.md
+// Future: buildPrompt('ui', description)
 ```
 
-**Benefits:**
-- Consumer doesn't need to know AJV
-- Consistent error formatting
-- Can swap validator implementation later
+## API Summary
 
-## Schema Details
-
-### types.schema.json
-
-Defines the structure of blueprint YAML files for entities:
-
-**Key Sections:**
-- `version`: Schema version (currently 1)
-- `defaults`: Default settings for all entities
-- `entities`: Object of entity definitions
-  - Each entity has: `plural`, `fields`, `filters`, `indexes`, `relationships`, etc.
-  - Fields have: `type`, `required`, `default`, `unique`, etc.
-
-**Supported Field Types:**
-```
-string, int, float, boolean, any, url, isoDate, objectId, enum, object,
-string[], int[], float[], boolean[], objectId[], array,
-secretKey, encryptedKey
-```
-
-### roles.schema.json
-
-Defines roles and permissions:
-
-**Key Sections:**
-- `version`: Schema version
-- `roles`: Object of role definitions
-  - Each role has: `description`, `permissions`
-  - Permissions format: `entity:action` (e.g., `user:create`)
-
-## AI Prompt Template
-
-**File:** `prompts/radish-schema-generation.md`
-
-**Purpose:** System prompt for LLMs to generate blueprint YAML from natural language
-
-**Key Sections:**
-1. Role definition (data modeling expert)
-2. Output format requirements (JSON with types/roles)
-3. Blueprint structure explanation
-4. Entity modeling guidelines
-5. Field type reference
-6. Relationship patterns
-7. Common mistakes to avoid
-8. Examples
-
-**Usage in radish-wizard:**
+### Validators
 ```javascript
-import { getSchemaPrompt } from '@radish/schemas/prompts';
-
-const systemPrompt = getSchemaPrompt();
-const userPrompt = "Build a blog with posts and comments";
-
-const response = await openai.chat.completions.create({
-  model: 'gpt-4',
-  messages: [
-    { role: 'system', content: systemPrompt },
-    { role: 'user', content: userPrompt }
-  ]
-});
+validateBlueprint(data, type)        // Validate parsed object
+validateFromJSON(jsonString, type)   // Parse JSON string + validate
+formatValidationErrors(errors)       // Format AJV errors for display
+toYAML(data)                         // Convert to YAML for display
+getSchemas()                         // Get all schema objects
 ```
 
-## Testing Strategy
-
-**Current Tests (test.js):**
-1. Valid blueprint validation (should pass)
-2. Invalid blueprint validation (should fail with specific error)
-3. Schema loading (schemas should load without errors)
-
-**Test Approach:**
-- Simple node script, no test framework
-- Just validates core functionality works
-- Easy to run: `node test.js`
-
-**Future Test Improvements:**
-- Add more edge cases
-- Test all field types
-- Test relationship validation
-- Test enum validation
-- Test required field validation
-
-## Version History
-
-- **v1.0.0** (planned) - Initial release
-  - types.schema.json (from radish-cli)
-  - roles.schema.json (from radish-cli)
-  - AJV validators
-  - AI prompt template
-
-## Migration Impact
-
-### For radish-cli
-
-**Before:**
+### Prompts
 ```javascript
-import typesSchema from './schemas/types.schema.json';
-import Ajv from 'ajv';
-
-const ajv = new Ajv({ allErrors: true, strict: false });
-const validate = ajv.compile(typesSchema);
-
-if (!validate(data)) {
-  console.error('Validation errors:', validate.errors);
-}
+buildPrompt(type, description)       // Build prompt with description injected
+getSchemaPrompt()                    // Raw types/roles prompt template
+getAppPrompt()                       // Raw app prompt template
+getSchemaForPrompt(type)             // Schema as JSON string for prompts
 ```
 
-**After:**
+### Schemas
 ```javascript
-import { validateBlueprint, formatValidationErrors } from '@radish/schemas';
-
-const result = validateBlueprint(data, 'types');
-if (!result.valid) {
-  console.error('Validation errors:', formatValidationErrors(result.errors));
-}
+typesSchema    // Parsed types JSON Schema object
+rolesSchema    // Parsed roles JSON Schema object
+appSchema      // Parsed app JSON Schema object
+getSchema(name) // Get schema by name
 ```
 
-**Changes Required:**
-- Add `@radish/schemas` to package.json dependencies
-- Update imports in `src/commands/validate.mjs`
-- Update imports in any other files using schemas
-- Can delete `schemas/` directory after migration
-
-### For radish-wizard
-
-**Before:**
+### Versioning
 ```javascript
-// Load schema
-const typesSchema = JSON.parse(
-  readFileSync('../../schemas/types.schema.json', 'utf-8')
-);
-
-// Load prompt
-const prompt = readFileSync('src/prompts/radish-schema-generation.md', 'utf-8');
-
-// Validate with AJV
-const ajv = new Ajv({ allErrors: true, strict: false });
-const validate = ajv.compile(typesSchema);
+VERSIONING.packageVersion        // "1.2.0"
+VERSIONING.currentSpecVersion    // 1
+VERSIONING.supportedSpecVersions // [1]
+VERSIONING.minCliVersion         // "0.1.0"
 ```
 
-**After:**
-```javascript
-import { validateBlueprint } from '@radish/schemas';
-import { getSchemaPrompt } from '@radish/schemas/prompts';
+## App Blueprint (app.schema.json)
 
-const result = validateBlueprint(data, 'types');
-const prompt = getSchemaPrompt();
-```
+The app blueprint is the master document that drives all other generators:
 
-**Changes Required:**
-- Add `@radish/schemas` to wizard/package.json
-- Update `src/routes/+page.server.ts` validation
-- Remove `src/prompts/radish-schema-generation.md`
-- Update prompt loading logic
-
-## Common Pitfalls
-
-### Schema Changes Are Breaking
-
-If you modify the schema structure (rename fields, change types, remove fields):
-- This is a **MAJOR** version bump (2.0.0)
-- Requires coordinated update of consumers
-- Need migration guide for users
-
-**Safe Changes (minor/patch):**
-- Adding optional fields
-- Adding new enum values
-- Loosening validation (making fields optional)
-- Fixing typos in descriptions
-
-**Breaking Changes (major):**
-- Renaming fields
-- Changing field types
-- Making optional fields required
-- Removing enum values
-- Changing validation rules
-
-### Don't Forget to Update Prompt
-
-If schemas change significantly, the AI prompt template needs to match:
-- Update examples in prompt
-- Update field type reference
-- Update common mistakes section
-
-### Circular Dependencies
-
-Don't import from consumer projects:
-- ❌ @radish/schemas imports from radish-cli
-- ✅ radish-cli imports from @radish/schemas
-
-This package should have no dependencies on radish-cli or radish-wizard.
+- **app** - Name, description, domain, tags
+- **audience** - User personas (primary, secondary, admin)
+- **workflows** - Core user journeys with actors and descriptions
+- **categories** - Content taxonomy with subcategories
+- **style** - Branding hints (theme, tone, palette, typography, layout, icons)
+- **features** - Feature flags (auth, roles, adminPanel, api, search, etc.)
+- **entityOverview** - High-level entity descriptions grouped by domain concern
+- **accessPatterns** - Who can do what, by access level
+- **database** - Database engine and name
 
 ## Dependencies
 
 **Production:**
 - `ajv@^8.12.0` - JSON Schema validator
 - `ajv-formats@^2.1.1` - Additional AJV format validators
-- `yaml@^2.5.0` - YAML parser (for potential future use)
 
-**None:** No dev dependencies needed (simple project)
+**No YAML dependency.** The `toYAML()` utility is built-in with zero external dependencies.
 
-**Peer Dependencies:** None (self-contained)
+## Consumer Projects
 
-## File Locations Reference
+- **@radish/cli** (`/Users/ctmeece/Projects/radish-cli`) - CLI tool, code generators
+- **@radish/wizard** - AI-powered blueprint generation wizard
 
-### In This Package
-- Schemas: `/Users/ctmeece/Projects/radish-schemas/schemas/`
-- Validators: `/Users/ctmeece/Projects/radish-schemas/validators/`
-- Prompts: `/Users/ctmeece/Projects/radish-schemas/prompts/`
+## Registry
 
-### In Consumer Projects
-- radish-cli: `/Users/ctmeece/Projects/radish-cli/`
-  - Current schemas: `schemas/*.json` (will be deleted after migration)
-  - Validate command: `src/commands/validate.mjs`
+- **GitLab:** gitlab.mini1.abeedoo.com/abeedoo/radish-schemas
+- **Project ID:** 6
+- **npm:** `@radish/schemas` via GitLab private registry
+- **Auth:** Deploy token with `read_package_registry` scope
 
-- radish-wizard: `/Users/ctmeece/Projects/radish-cli/wizard/`
-  - Current prompt: `src/prompts/radish-schema-generation.md` (will be deleted)
-  - Validation: `src/routes/+page.server.ts`
+## Related Documentation
 
-## Quick Command Reference
-
-```bash
-# Development
-node test.js                          # Run tests
-npm pack                              # Create tarball for local testing
-
-# Publishing
-npm version patch                     # Bump version (1.0.0 → 1.0.1)
-git push --follow-tags                # Push and trigger CI publish
-
-# Installation in consumers
-npm install @radish/schemas           # Install latest
-npm install @radish/schemas@1.0.0     # Install specific version
-npm update @radish/schemas            # Update to latest compatible
-
-# Local testing in consumers
-npm install ../radish-schemas/radish-schemas-1.0.0.tgz
-```
+- **README.md** - Package usage and API reference
+- **SETUP.md** - GitLab publishing and consumer setup
+- **MIGRATION.md** - Migration guide (including YAML to JSON)
+- **VERSIONING-STRATEGY.md** - Two-version system details
+- **UI-LAYER-STRATEGY.md** - UI Layer design (MVP)
