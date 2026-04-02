@@ -1,4 +1,4 @@
-# Versioning Strategy for @radish/schemas and radish-cli
+# Versioning Strategy for @radish/schemas and @radish/cli
 
 ## Core Principle
 
@@ -18,7 +18,7 @@ We maintain **two distinct versions**:
 - **Follows**: Standard semantic versioning
 
 ### 2. Blueprint Spec Version
-- **Format**: `version: N` (in blueprint YAML)
+- **Format**: `"version": N` (in blueprint JSON)
 - **Purpose**: Tracks the blueprint file format itself
 - **Changes**: Only when author-facing schema format changes
 
@@ -318,7 +318,7 @@ radish-cli: looser version ranges
 ### "Should I bump spec version?"
 
 Ask this question:
-**"Do existing blueprint YAML files need to change?"**
+**"Do existing blueprint JSON files need to change?"**
 
 - **YES** → Spec version bump required
 - **NO** → Package version bump only
@@ -359,28 +359,29 @@ Ask this question:
 ```markdown
 ## Version Compatibility
 
-- Package: `@radish/schemas@1.4.2`
+- Package: `@radish/schemas@1.2.0`
 - Blueprint Spec: `version: 1`
-- Compatible CLI: `radish-cli@>=0.1.0`
+- Compatible CLI: `@radish/cli@>=0.1.0`
 ```
 
 ---
 
 ## Implementation Checklist
 
-### Immediate (Next Release)
+### Completed (v1.1.0 - v1.2.0)
 
-- [ ] Add `VERSIONING` export to `@radish/schemas/index.js`
-- [ ] Update `package.json` with exact version
-- [ ] Add spec version to all example blueprints
-- [ ] Document compatibility policy in README
-- [ ] Add "Spec Impact" section to CHANGELOG template
+- [x] Add `VERSIONING` export to `@radish/schemas/index.js`
+- [x] Update `package.json` with exact version
+- [x] Add spec version to all example blueprints
+- [x] Document compatibility policy in README
+- [x] Require `version` field in all blueprint schemas
+- [x] Switch to JSON as source of truth (YAML removed as dependency)
 
-### Short Term (Next Month)
+### Short Term
 
-- [ ] Implement spec version validation in radish-cli
+- [ ] Implement spec version validation in @radish/cli
 - [ ] Add compatibility check to `validate` command
-- [ ] Create MIGRATION.md template for future use
+- [ ] Add "Spec Impact" section to CHANGELOG template
 - [ ] Add deprecation warning helpers
 
 ### Long Term (When Needed)
