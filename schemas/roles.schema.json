@@ -51,7 +51,7 @@
               "description": "List of permission keys (ignored for system roles)",
               "items": {
                 "type": "string",
-                "pattern": "^[a-z][a-z0-9]*:[a-z*][a-z0-9:*]*$",
+                "pattern": "^[a-z][a-z0-9-]*:[a-z*][a-z0-9:*-]*$",
                 "description": "Permission key in format 'entity:action' or 'entity:action:scope'"
               },
               "uniqueItems": true
