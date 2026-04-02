@@ -1,4 +1,4 @@
-import { validateBlueprint, formatValidationErrors, getSchemas } from './index.js';
+import { validateBlueprint, validateFromJSON, toYAML, formatValidationErrors, getSchemas } from './index.js';
 
 // Test data - valid blueprint
 const validBlueprint = {
@@ -11,7 +11,7 @@ const validBlueprint = {
       plural: 'posts',
       fields: {
         title: { type: 'string', required: true },
-        content: { type: 'string' }, // Changed from 'text' to 'string'
+        content: { type: 'string' },
         published: { type: 'boolean', default: false }
       }
     }
@@ -34,7 +34,7 @@ const invalidBlueprint = {
 console.log('🧪 Testing @radish/schemas\n');
 
 // Test 1: Valid blueprint
-console.log('Test 1: Valid blueprint');
+console.log('Test 1: Valid types blueprint');
 const result1 = validateBlueprint(validBlueprint, 'types');
 console.log(result1.valid ? '✅ PASS' : '❌ FAIL');
 if (!result1.valid) {
@@ -43,7 +43,7 @@ if (!result1.valid) {
 console.log('');
 
 // Test 2: Invalid blueprint
-console.log('Test 2: Invalid blueprint (should fail)');
+console.log('Test 2: Invalid types blueprint (should fail)');
 const result2 = validateBlueprint(invalidBlueprint, 'types');
 console.log(!result2.valid ? '✅ PASS' : '❌ FAIL');
 if (!result2.valid) {
@@ -140,7 +140,7 @@ if (!result4.valid) {
 }
 console.log('');
 
-// Test 5: Invalid app blueprint (missing required app.name)
+// Test 5: Invalid app blueprint (missing app.name)
 console.log('Test 5: Invalid app blueprint (missing app.name)');
 const invalidApp = {
   version: 1,
@@ -171,8 +171,32 @@ if (!result6.valid) {
 }
 console.log('');
 
-// Test 7: Get schemas
-console.log('Test 7: Get schemas');
+// Test 7: validateFromJSON - valid JSON string
+console.log('Test 7: validateFromJSON with valid JSON string');
+const jsonString = JSON.stringify(validBlueprint);
+const result7 = validateFromJSON(jsonString, 'types');
+console.log(result7.valid && result7.data ? '✅ PASS' : '❌ FAIL');
+console.log('');
+
+// Test 8: validateFromJSON - invalid JSON string
+console.log('Test 8: validateFromJSON with invalid JSON string');
+const result8 = validateFromJSON('{ not valid json }}}', 'types');
+console.log(!result8.valid && result8.data === null ? '✅ PASS' : '❌ FAIL');
+if (!result8.valid) {
+  console.log('Expected errors:', formatValidationErrors(result8.errors));
+}
+console.log('');
+
+// Test 9: toYAML conversion
+console.log('Test 9: toYAML conversion');
+const yamlOutput = toYAML(minimalApp);
+console.log(typeof yamlOutput === 'string' && yamlOutput.includes('MinimalApp') ? '✅ PASS' : '❌ FAIL');
+console.log('Output preview:');
+console.log(yamlOutput);
+console.log('');
+
+// Test 10: Get schemas
+console.log('Test 10: Get schemas');
 const schemas = getSchemas();
 console.log(schemas.types ? '✅ types schema loaded' : '❌ types schema missing');
 console.log(schemas.roles ? '✅ roles schema loaded' : '❌ roles schema missing');
