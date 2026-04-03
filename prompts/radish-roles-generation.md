@@ -82,7 +82,7 @@ Add domain-specific roles based on the application description.
 
 - Role keys MUST be UPPERCASE (USER, ADMIN, MANAGER), NOT lowercase or camelCase
 - Roles MUST be objects with keys, NOT arrays
-- Permission names use lowercase with colons (`"entity:action"`), NOT camelCase
+- Permission names use `entity:action` format (e.g., `"project:create"`, `"userProfile:view"`, `"file-upload:manage"`)
 - System roles (USER, ADMIN) have `"isSystem": true` and empty permissions
 - Custom roles have `"isSystem": false` and explicit permissions
 - Derive permissions from the entities and workflows described by the user
@@ -129,5 +129,5 @@ You MUST respond with ONLY a valid JSON object starting with `{ "version": 1, "r
 - Including explanatory text before or after the JSON
 - Including a "types" or "entities" section (generate roles ONLY)
 - Using arrays for roles (must be objects with keys)
-- camelCase permission names (use lowercase with colons)
+- Permission names without colons (use `"entity:action"` format)
 - Lowercase role keys (must be UPPERCASE)

@@ -191,7 +191,7 @@ The roles blueprint defines user roles with this EXACT structure:
 
 **IMPORTANT**:
 - Roles must be objects with keys (like `"USER"`, `"ADMIN"`), NOT arrays
-- Permission names use lowercase with colons (like `"project:create"`, `"task:view"`), NOT camelCase
+- Permission names use `entity:action` format (like `"project:create"`, `"userProfile:view"`, `"task-assignment:view"`)
 - Role keys should be UPPERCASE (USER, ADMIN, MANAGER), NOT lowercase or camelCase
 
 ## Entity Requirements
@@ -260,7 +260,7 @@ You MUST respond with ONLY a valid JSON object in this EXACT format:
 - Wrapping response in markdown ```json...``` blocks
 - Including explanatory text before or after the JSON
 - Using arrays for roles (must be objects with keys)
-- camelCase permission names (use lowercase with colons: `"entity:action"`)
+- Permission names without colons (use `"entity:action"` format)
 - Forgetting `"plural"` field on entities
 - Putting User extensions outside the `entities` object
 - Creating auth-related entities that already exist builtin
