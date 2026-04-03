@@ -56,6 +56,7 @@ fastify.post('/validate', {
   return {
     valid: result.valid,
     errors: result.errors,
+    data,
     formatted: result.valid ? null : formatValidationErrors(result.errors)
   };
 });
