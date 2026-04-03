@@ -231,6 +231,49 @@ Gets a schema as a JSON string for inclusion in prompts.
   - `type` ('types' | 'roles' | 'app'): Schema type
 - **Returns:** `string` - Stringified JSON schema
 
+## Validation Service
+
+This package includes a standalone Fastify validation service for deployment at `schemas.radishplatform.com`.
+
+### Running Locally
+
+```bash
+npm start
+# Server starts on http://localhost:3000
+```
+
+### Endpoints
+
+#### `GET /health`
+Returns service status and version info.
+
+#### `POST /validate`
+Validates a parsed JSON object.
+```json
+{ "type": "app", "data": { "version": 1, "app": { "name": "Test", "description": "..." } } }
+```
+Returns: `{ "valid": true|false, "errors": [...], "formatted": "..." }`
+
+#### `POST /validate/json`
+Parses a raw JSON string and validates (ideal for AI output).
+```json
+{ "type": "types", "json": "{\"version\":1,\"entities\":{...}}" }
+```
+Returns: `{ "valid": true|false, "errors": [...], "data": {...}, "formatted": "..." }`
+
+#### `GET /schemas/:type`
+Returns the raw JSON schema for `app`, `types`, or `roles`.
+
+#### `POST /to-yaml`
+Converts a JSON object to YAML for display.
+
+### Docker Deployment
+
+```bash
+docker build -t radish-schemas .
+docker run -p 3000:3000 radish-schemas
+```
+
 ## License
 
 MIT

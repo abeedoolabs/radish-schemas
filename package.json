@@ -22,7 +22,8 @@
     "README.md"
   ],
   "scripts": {
-    "test": "node --test",
+    "test": "node test.js",
+    "start": "node server/index.js",
     "prepublishOnly": "echo 'Running pre-publish checks...'"
   },
   "keywords": [
@@ -39,7 +40,8 @@
   "sideEffects": false,
   "dependencies": {
     "ajv": "^8.12.0",
-    "ajv-formats": "^2.1.1"
+    "ajv-formats": "^2.1.1",
+    "fastify": "^5.8.4"
   },
   "publishConfig": {
     "@radish:registry": "https://gitlab.mini1.abeedoo.com/api/v4/projects/6/packages/npm/"

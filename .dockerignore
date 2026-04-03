@@ -1,0 +1,8 @@
+node_modules
+.git
+.gitignore
+.claude
+*.md
+test.js
+types/
+.DS_Store
