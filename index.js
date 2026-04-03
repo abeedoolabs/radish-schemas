@@ -28,7 +28,7 @@ export {
  * @property {string} minCliVersion - Minimum radish-cli version compatible with this package
  */
 export const VERSIONING = {
-  packageVersion: '1.3.3',
+  packageVersion: '1.4.0',
   currentSpecVersion: 1,
   supportedSpecVersions: [1],
   minCliVersion: '0.1.0'
