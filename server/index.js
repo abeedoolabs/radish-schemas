@@ -7,6 +7,7 @@ import {
   getSchemas,
   VERSIONING
 } from '../index.js';
+import { buildPrompt, getSchemaForPrompt } from '../prompts/index.js';
 
 const fastify = Fastify({
   logger: true
@@ -109,6 +110,43 @@ fastify.post('/to-yaml', async (request, reply) => {
   return {
     yaml: toYAML(data)
   };
+});
+
+// Get a prompt with description injected
+fastify.post('/prompts/:type', {
+  schema: {
+    body: {
+      type: 'object',
+      required: ['description'],
+      properties: {
+        description: { type: 'string' }
+      }
+    }
+  }
+}, async (request, reply) => {
+  const { type } = request.params;
+  const { description } = request.body;
+
+  try {
+    const prompt = buildPrompt(type, description);
+    return { prompt };
+  } catch (err) {
+    reply.status(400);
+    return { error: err.message };
+  }
+});
+
+// Get a raw prompt template (no description injected)
+fastify.get('/prompts/:type', async (request, reply) => {
+  const { type } = request.params;
+
+  try {
+    const prompt = buildPrompt(type, '{{USER_DESCRIPTION}}');
+    return { prompt };
+  } catch (err) {
+    reply.status(400);
+    return { error: err.message };
+  }
 });
 
 // Start server
