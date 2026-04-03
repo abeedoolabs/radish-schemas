@@ -131,7 +131,7 @@ Application-level blueprint (master document) including:
 
 ### Current Version
 
-- **Package Version:** `@radish/schemas@1.2.0`
+- **Package Version:** `@radish/schemas@1.4.0`
 - **Blueprint Spec Version:** `1`
 - **Minimum CLI Version:** `radish-cli@0.1.0`
 
@@ -150,7 +150,7 @@ For detailed versioning strategy, see [VERSIONING-STRATEGY.md](./VERSIONING-STRA
 ```javascript
 import { VERSIONING } from '@radish/schemas';
 
-console.log(VERSIONING.packageVersion);           // "1.2.0"
+console.log(VERSIONING.packageVersion);           // "1.4.0"
 console.log(VERSIONING.currentSpecVersion);       // 1
 console.log(VERSIONING.supportedSpecVersions);    // [1]
 console.log(VERSIONING.minCliVersion);            // "0.1.0"
@@ -233,7 +233,13 @@ Gets a schema as a JSON string for inclusion in prompts.
 
 ## Validation Service
 
-This package includes a standalone Fastify validation service for deployment at `schemas.radishplatform.com`.
+This package includes a standalone Fastify validation service deployed at `https://schemas.radishplatform.com`.
+
+All Radish tools (wizard, n8n workflows, CLI) use this service as the single source of truth for validation.
+
+### Live URL
+
+`https://schemas.radishplatform.com`
 
 ### Running Locally
 
@@ -246,26 +252,58 @@ npm start
 
 #### `GET /health`
 Returns service status and version info.
+```bash
+curl https://schemas.radishplatform.com/health
+```
+Returns: `{ "status": "ok", "version": "1.4.0", "specVersion": 1, "supportedSpecVersions": [1] }`
 
 #### `POST /validate`
 Validates a parsed JSON object.
-```json
-{ "type": "app", "data": { "version": 1, "app": { "name": "Test", "description": "..." } } }
+```bash
+curl -X POST https://schemas.radishplatform.com/validate \
+  -H "Content-Type: application/json" \
+  -d '{"type": "app", "data": {"version": 1, "app": {"name": "Test", "description": "A test"}}}'
 ```
-Returns: `{ "valid": true|false, "errors": [...], "formatted": "..." }`
+Returns: `{ "valid": true|false, "errors": [...], "data": {...}, "formatted": "..." }`
 
 #### `POST /validate/json`
 Parses a raw JSON string and validates (ideal for AI output).
-```json
-{ "type": "types", "json": "{\"version\":1,\"entities\":{...}}" }
+```bash
+curl -X POST https://schemas.radishplatform.com/validate/json \
+  -H "Content-Type: application/json" \
+  -d '{"type": "types", "json": "{\"version\":1,\"entities\":{...}}"}'
 ```
 Returns: `{ "valid": true|false, "errors": [...], "data": {...}, "formatted": "..." }`
 
 #### `GET /schemas/:type`
 Returns the raw JSON schema for `app`, `types`, or `roles`.
+```bash
+curl https://schemas.radishplatform.com/schemas/app
+```
+
+#### `POST /prompts/:type`
+Returns an AI prompt with user description injected. Types: `app`, `types`, `roles`.
+```bash
+curl -X POST https://schemas.radishplatform.com/prompts/app \
+  -H "Content-Type: application/json" \
+  -d '{"description": "A blog with posts and comments"}'
+```
+Returns: `{ "prompt": "..." }`
+
+#### `GET /prompts/:type`
+Returns the raw prompt template (with `{{USER_DESCRIPTION}}` placeholder).
+```bash
+curl https://schemas.radishplatform.com/prompts/types
+```
 
 #### `POST /to-yaml`
 Converts a JSON object to YAML for display.
+```bash
+curl -X POST https://schemas.radishplatform.com/to-yaml \
+  -H "Content-Type: application/json" \
+  -d '{"version": 1, "app": {"name": "Blog", "description": "A blog"}}'
+```
+Returns: `{ "yaml": "..." }`
 
 ### Docker Deployment
 

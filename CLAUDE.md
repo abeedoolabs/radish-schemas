@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**@radish/schemas** is a shared npm package (v1.2.0) providing JSON schemas, validators, and AI prompts for the Radish CLI ecosystem. Published to a private GitLab npm registry.
+**@radish/schemas** is a shared npm package (v1.4.0) providing JSON schemas, validators, and AI prompts for the Radish CLI ecosystem. Published to a private GitLab npm registry. Also deployed as a standalone validation service at `https://schemas.radishplatform.com`.
 
 **All blueprints use JSON as the source of truth.** YAML is available only as a display utility.
 
@@ -10,7 +10,7 @@
 
 ```
 @radish/schemas/
-├── package.json              # v1.2.0, @radish scope, GitLab registry
+├── package.json              # v1.4.0, @radish scope, GitLab registry
 ├── index.js                  # Main entry point - re-exports all modules
 │
 ├── schemas/                  # JSON Schema definitions
@@ -23,10 +23,17 @@
 │   └── index.js              # validateBlueprint, validateFromJSON, toYAML, formatValidationErrors
 │
 ├── prompts/                  # AI prompt templates (request raw JSON output)
-│   ├── radish-schema-generation.md   # Types/roles generation
+│   ├── radish-types-generation.md    # Types-only generation
+│   ├── radish-roles-generation.md    # Roles-only generation
 │   ├── radish-app-generation.md      # App blueprint generation
-│   └── index.js              # buildPrompt, getSchemaPrompt, getAppPrompt
+│   ├── radish-schema-generation.md   # Combined types+roles (deprecated)
+│   └── index.js              # buildPrompt, getTypesPrompt, getRolesPrompt, getAppPrompt
 │
+├── server/                   # Standalone validation service (Fastify)
+│   └── index.js              # HTTP API deployed at schemas.radishplatform.com
+│
+├── Dockerfile                # For Coolify deployment
+├── .dockerignore
 ├── test.js                   # 10 validation tests
 ├── .gitlab-ci.yml            # CI/CD pipeline (test + publish on tag)
 │
@@ -46,15 +53,15 @@
 | Type | Schema | Prompt | Purpose |
 |------|--------|--------|---------|
 | `app` | app.schema.json | radish-app-generation.md | Master app document |
-| `types` | types.schema.json | radish-schema-generation.md | Data layer entities |
-| `roles` | roles.schema.json | radish-schema-generation.md | Roles/permissions |
+| `types` | types.schema.json | radish-types-generation.md | Data layer entities |
+| `roles` | roles.schema.json | radish-roles-generation.md | Roles/permissions |
 
 ### Validators
 ```javascript
 import { validateBlueprint, validateFromJSON, toYAML, formatValidationErrors } from '@radish/schemas';
 
 // Validate parsed object
-validateBlueprint(data, 'types')  // { valid, errors }
+validateBlueprint(data, 'types')  // { valid, errors, data }
 
 // Parse JSON string + validate (ideal for AI output)
 validateFromJSON(jsonString, 'app')  // { valid, errors, data }
@@ -68,13 +75,26 @@ toYAML(data)  // YAML string (zero dependencies)
 import { buildPrompt } from '@radish/schemas/prompts';
 
 buildPrompt('app', description)    // App blueprint prompt
-buildPrompt('types', description)  // Types/roles prompt
-buildPrompt('roles', description)  // Types/roles prompt (same template)
+buildPrompt('types', description)  // Types-only prompt
+buildPrompt('roles', description)  // Roles-only prompt
 ```
+
+### Validation Service
+Deployed at `https://schemas.radishplatform.com`. All endpoints:
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/health` | GET | Service status and version |
+| `/validate` | POST | Validate parsed JSON object |
+| `/validate/json` | POST | Parse JSON string + validate |
+| `/schemas/:type` | GET | Get raw JSON schema |
+| `/prompts/:type` | GET | Get raw prompt template |
+| `/prompts/:type` | POST | Get prompt with description injected |
+| `/to-yaml` | POST | Convert JSON to YAML for display |
 
 ### Versioning
 Two-version system:
-- **Package version** (semver): `@radish/schemas@1.2.0`
+- **Package version** (semver): `@radish/schemas@1.4.0`
 - **Blueprint spec version**: `"version": 1` in each blueprint file
 - See VERSIONING-STRATEGY.md for details
 
@@ -82,29 +102,34 @@ Two-version system:
 
 1. **@radish/cli** (`/Users/ctmeece/Projects/radish-cli`)
    - Code generators for data layer, UI layer
-   - Blueprint validation
+   - Blueprint validation via npm package
    - Package name: `@radish/cli` (binary: `radish-cli`)
 
-2. **@radish/wizard** - AI-powered blueprint generation
+2. **@radish/wizard** - AI-powered blueprint generation via npm package
 
-## Registry
+3. **n8n workflows** - Blueprint generation pipeline via HTTP service
+
+## Registry & Deployment
 
 - **GitLab:** gitlab.mini1.abeedoo.com/abeedoo/radish-schemas
 - **Project ID:** 6
-- **Published versions:** v1.0.0, v1.1.0, v1.2.0
+- **npm versions:** v1.0.0 through v1.4.0
+- **Validation service:** https://schemas.radishplatform.com (Coolify)
 
 ## Development Workflow
 
 1. Create feature branch from `dev`
 2. Make changes, run `node test.js`
 3. Merge to `dev`, then to `main`
-4. Tag version: `git tag v1.x.0 && git push origin v1.x.0`
-5. GitLab CI publishes automatically
+4. For npm package changes: tag version `git tag v1.x.0 && git push origin v1.x.0`
+5. For server-only changes: push to main (Coolify auto-deploys)
+6. GitLab CI publishes npm package on tags
 
 ## Dependencies
 
 - `ajv@^8.12.0` - JSON Schema validation
 - `ajv-formats@^2.1.1` - AJV format validators
+- `fastify@^5.x` - HTTP server (for validation service only, not shipped in npm package)
 - No YAML dependency (toYAML is built-in)
 
 ## Common Tasks

@@ -8,12 +8,13 @@ A shared npm package providing JSON schemas, validators, and AI prompts for the 
 
 **Problem:** Multiple Radish projects (CLI, wizard) need identical schemas, validators, and prompts. Duplicating these causes version drift and maintenance burden.
 
-**Solution:** Single versioned package published to private GitLab npm registry.
+**Solution:** Single versioned package published to private GitLab npm registry, plus a standalone HTTP validation service deployed at `https://schemas.radishplatform.com`.
 
 ## Current State
 
-**Version:** 1.2.0 (published to GitLab registry)
+**Version:** 1.4.0 (published to GitLab registry)
 **Blueprint Format:** JSON (source of truth). YAML available as display utility only.
+**Validation Service:** https://schemas.radishplatform.com (Coolify)
 
 ## Architecture
 
@@ -28,14 +29,20 @@ A shared npm package providing JSON schemas, validators, and AI prompts for the 
 ├── validators/                       # Validation utilities
 │   └── index.js                      # validateBlueprint, validateFromJSON, toYAML
 │
-├── prompts/                          # AI prompt templates
-│   ├── radish-schema-generation.md   # Types/roles generation prompt
-│   ├── radish-app-generation.md      # App blueprint generation prompt
-│   └── index.js                      # buildPrompt, getSchemaPrompt, getAppPrompt
+├── prompts/                          # AI prompt templates (separate per type)
+│   ├── radish-types-generation.md    # Types-only generation
+│   ├── radish-roles-generation.md    # Roles-only generation
+│   ├── radish-app-generation.md      # App blueprint generation
+│   ├── radish-schema-generation.md   # Combined types+roles (deprecated)
+│   └── index.js                      # buildPrompt, getTypesPrompt, getRolesPrompt, getAppPrompt
 │
+├── server/                           # Standalone validation service
+│   └── index.js                      # Fastify HTTP API
+│
+├── Dockerfile                        # For Coolify deployment
 ├── index.js                          # Main entry point - re-exports everything
 ├── test.js                           # 10 validation tests
-└── package.json                      # v1.2.0, published to GitLab
+└── package.json                      # v1.4.0, published to GitLab
 ```
 
 ## Key Design Decisions
@@ -53,7 +60,7 @@ Three blueprint types, each with a schema, validator, and prompt:
 | `roles` | roles.schema.json | Roles, permissions, access control |
 
 ### Two-Version System
-- **Package version** (npm semver): `@radish/schemas@1.2.0`
+- **Package version** (npm semver): `@radish/schemas@1.4.0`
 - **Blueprint spec version**: `version: 1` in each blueprint
 - Package can evolve within major version without breaking blueprints
 - Breaking blueprint changes = major version bump + spec version bump
@@ -62,11 +69,11 @@ Three blueprint types, each with a schema, validator, and prompt:
 Schemas are loaded once in `schemas/index.js` and imported by validators and prompts. No duplicate file reads.
 
 ### Extensible Prompt System
-`buildPrompt(type, description)` maps blueprint types to prompt templates:
+`buildPrompt(type, description)` maps blueprint types to separate prompt templates:
 ```javascript
 buildPrompt('app', description)    // Uses radish-app-generation.md
-buildPrompt('types', description)  // Uses radish-schema-generation.md
-buildPrompt('roles', description)  // Uses radish-schema-generation.md
+buildPrompt('types', description)  // Uses radish-types-generation.md
+buildPrompt('roles', description)  // Uses radish-roles-generation.md
 // Future: buildPrompt('ui', description)
 ```
 
@@ -84,7 +91,8 @@ getSchemas()                         // Get all schema objects
 ### Prompts
 ```javascript
 buildPrompt(type, description)       // Build prompt with description injected
-getSchemaPrompt()                    // Raw types/roles prompt template
+getTypesPrompt()                     // Raw types-only prompt template
+getRolesPrompt()                     // Raw roles-only prompt template
 getAppPrompt()                       // Raw app prompt template
 getSchemaForPrompt(type)             // Schema as JSON string for prompts
 ```
@@ -99,7 +107,7 @@ getSchema(name) // Get schema by name
 
 ### Versioning
 ```javascript
-VERSIONING.packageVersion        // "1.2.0"
+VERSIONING.packageVersion        // "1.4.0"
 VERSIONING.currentSpecVersion    // 1
 VERSIONING.supportedSpecVersions // [1]
 VERSIONING.minCliVersion         // "0.1.0"
@@ -119,30 +127,41 @@ The app blueprint is the master document that drives all other generators:
 - **accessPatterns** - Who can do what, by access level
 - **database** - Database engine and name
 
+## Validation Service
+
+Standalone Fastify HTTP service deployed at `https://schemas.radishplatform.com` via Coolify.
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/health` | GET | Service status and version |
+| `/validate` | POST | Validate parsed JSON object |
+| `/validate/json` | POST | Parse JSON string + validate |
+| `/schemas/:type` | GET | Get raw JSON schema |
+| `/prompts/:type` | GET | Get raw prompt template |
+| `/prompts/:type` | POST | Get prompt with description injected |
+| `/to-yaml` | POST | Convert JSON to YAML for display |
+
+Server code lives in `server/index.js`. Not shipped in npm package (excluded by `files` field). Server-only changes don't need a version tag - just push to main and Coolify redeploys.
+
 ## Dependencies
 
 **Production:**
 - `ajv@^8.12.0` - JSON Schema validator
 - `ajv-formats@^2.1.1` - Additional AJV format validators
+- `fastify@^5.x` - HTTP server (validation service only, not in npm package)
 
 **No YAML dependency.** The `toYAML()` utility is built-in with zero external dependencies.
 
 ## Consumer Projects
 
-- **@radish/cli** (`/Users/ctmeece/Projects/radish-cli`) - CLI tool, code generators
-- **@radish/wizard** - AI-powered blueprint generation wizard
+- **@radish/cli** (`/Users/ctmeece/Projects/radish-cli`) - CLI tool, code generators (via npm package)
+- **@radish/wizard** - AI-powered blueprint generation (via npm package)
+- **n8n workflows** - Blueprint generation pipeline (via HTTP service)
 
-## Registry
+## Registry & Deployment
 
 - **GitLab:** gitlab.mini1.abeedoo.com/abeedoo/radish-schemas
 - **Project ID:** 6
 - **npm:** `@radish/schemas` via GitLab private registry
 - **Auth:** Deploy token with `read_package_registry` scope
-
-## Related Documentation
-
-- **README.md** - Package usage and API reference
-- **SETUP.md** - GitLab publishing and consumer setup
-- **MIGRATION.md** - Migration guide (including YAML to JSON)
-- **VERSIONING-STRATEGY.md** - Two-version system details
-- **UI-LAYER-STRATEGY.md** - UI Layer design (MVP)
+- **Validation service:** https://schemas.radishplatform.com (Coolify, auto-deploys from main)
