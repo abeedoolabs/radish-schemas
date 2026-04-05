@@ -43,7 +43,7 @@ fastify.post('/validate', {
       type: 'object',
       required: ['type', 'data'],
       properties: {
-        type: { type: 'string', enum: ['app', 'types', 'roles'] },
+        type: { type: 'string', enum: ['app', 'types', 'roles', 'ui'] },
         data: { type: 'object' }
       }
     }
@@ -68,7 +68,7 @@ fastify.post('/validate/json', {
       type: 'object',
       required: ['type', 'json'],
       properties: {
-        type: { type: 'string', enum: ['app', 'types', 'roles'] },
+        type: { type: 'string', enum: ['app', 'types', 'roles', 'ui'] },
         json: { type: 'string' }
       }
     }
