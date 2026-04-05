@@ -1,0 +1,346 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://radish.dev/schemas/ui.schema.json",
+  "title": "Radish UI Blueprint",
+  "description": "Schema for defining UI routes, pages, layouts, and content blocks. Content blocks are entity-driven and reference entities defined in the types blueprint.",
+  "type": "object",
+  "required": [
+    "version",
+    "routes",
+    "pages"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Blueprint spec version"
+    },
+    "app": {
+      "type": "object",
+      "description": "Application metadata for UI context (name, description used in templates)",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Application name for display in UI"
+        },
+        "description": {
+          "type": "string",
+          "description": "Application description for display in UI"
+        }
+      },
+      "additionalProperties": false
+    },
+    "routes": {
+      "type": "array",
+      "description": "Route definitions mapping URL paths to pages",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/route"
+      }
+    },
+    "pages": {
+      "type": "object",
+      "description": "Page definitions keyed by page identifier",
+      "minProperties": 1,
+      "patternProperties": {
+        "^[a-z][a-z0-9-]*$": {
+          "$ref": "#/definitions/page"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "route": {
+      "type": "object",
+      "required": [
+        "path",
+        "page"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "URL path pattern. Use [param] for dynamic segments (e.g., /courses/[id])",
+          "pattern": "^/"
+        },
+        "page": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Page identifier referencing a key in the pages object",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "title": {
+          "type": "string",
+          "description": "Page title for navigation and breadcrumbs"
+        },
+        "access": {
+          "$ref": "#/definitions/access"
+        }
+      }
+    },
+    "access": {
+      "description": "Access control for a route. Can be a simple string or a role/permission object.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "public",
+            "authenticated"
+          ],
+          "description": "Simple access level"
+        },
+        {
+          "type": "object",
+          "description": "Role and/or permission-based access control",
+          "additionalProperties": false,
+          "properties": {
+            "roles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Required roles (any match grants access)"
+            },
+            "permissions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Required permissions (any match grants access)"
+            }
+          }
+        }
+      ]
+    },
+    "page": {
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "layout": {
+          "$ref": "#/definitions/layout"
+        },
+        "content": {
+          "type": "array",
+          "description": "Ordered list of content blocks to render on the page",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/contentBlock"
+          }
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "description": "Page layout structure",
+      "additionalProperties": false,
+      "properties": {
+        "header": {
+          "type": "boolean",
+          "description": "Show application header"
+        },
+        "navigation": {
+          "type": "boolean",
+          "description": "Show main navigation"
+        },
+        "sidebar": {
+          "type": "boolean",
+          "description": "Show sidebar"
+        },
+        "footer": {
+          "type": "boolean",
+          "description": "Show application footer"
+        }
+      }
+    },
+    "contentBlock": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "description": "A content block rendered on a page",
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "hero" } },
+            "required": ["type"]
+          },
+          "then": {
+            "additionalProperties": false,
+            "required": ["type", "title"],
+            "properties": {
+              "type": { "const": "hero" },
+              "title": {
+                "type": "string",
+                "description": "Hero title. Supports interpolation with {app.name}, {app.description}"
+              },
+              "subtitle": {
+                "type": "string",
+                "description": "Hero subtitle. Supports interpolation"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "entity-list" } },
+            "required": ["type"]
+          },
+          "then": {
+            "additionalProperties": false,
+            "required": ["type", "entity"],
+            "properties": {
+              "type": { "const": "entity-list" },
+              "entity": {
+                "type": "string",
+                "description": "Entity name from types blueprint (PascalCase)",
+                "pattern": "^[A-Z][A-Za-z0-9]*$"
+              },
+              "title": {
+                "type": "string",
+                "description": "Section heading"
+              },
+              "display": {
+                "type": "string",
+                "enum": ["table", "grid", "list"],
+                "description": "Display mode for the list",
+                "default": "table"
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Maximum items to display"
+              },
+              "fields": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Fields to display. If omitted, auto-detected from entity metadata"
+              },
+              "filter": {
+                "$ref": "#/definitions/filter"
+              },
+              "sort": {
+                "$ref": "#/definitions/sort"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "entity-detail" } },
+            "required": ["type"]
+          },
+          "then": {
+            "additionalProperties": false,
+            "required": ["type", "entity"],
+            "properties": {
+              "type": { "const": "entity-detail" },
+              "entity": {
+                "type": "string",
+                "description": "Entity name from types blueprint (PascalCase)",
+                "pattern": "^[A-Z][A-Za-z0-9]*$"
+              },
+              "title": {
+                "type": "string",
+                "description": "Section heading"
+              },
+              "fields": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Fields to display. If omitted, auto-detected from entity metadata"
+              },
+              "actions": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["edit", "delete"]
+                },
+                "description": "Action buttons to show on the detail view"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "entity-form" } },
+            "required": ["type"]
+          },
+          "then": {
+            "additionalProperties": false,
+            "required": ["type", "entity"],
+            "properties": {
+              "type": { "const": "entity-form" },
+              "entity": {
+                "type": "string",
+                "description": "Entity name from types blueprint (PascalCase)",
+                "pattern": "^[A-Z][A-Za-z0-9]*$"
+              },
+              "title": {
+                "type": "string",
+                "description": "Form heading"
+              },
+              "action": {
+                "type": "string",
+                "enum": ["create", "edit"],
+                "description": "Form action type",
+                "default": "create"
+              },
+              "fields": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Fields to include in form. If omitted, auto-detected from entity metadata"
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["hero", "entity-list", "entity-detail", "entity-form"],
+          "description": "Content block type"
+        }
+      }
+    },
+    "filter": {
+      "type": "object",
+      "description": "Filter to apply when loading entity data",
+      "required": ["field", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "Field name to filter on"
+        },
+        "value": {
+          "type": "string",
+          "description": "Filter value. Supports interpolation with route params (e.g., {courseId}, {course.id})"
+        }
+      }
+    },
+    "sort": {
+      "type": "object",
+      "description": "Default sort order for entity lists",
+      "required": ["field"],
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "Field name to sort by"
+        },
+        "direction": {
+          "type": "string",
+          "enum": ["asc", "desc"],
+          "default": "asc",
+          "description": "Sort direction"
+        }
+      }
+    }
+  }
+}

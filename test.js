@@ -195,12 +195,93 @@ console.log('Output preview:');
 console.log(yamlOutput);
 console.log('');
 
-// Test 10: Get schemas
-console.log('Test 10: Get schemas');
+// Test 10: Valid UI blueprint
+console.log('Test 10: Valid UI blueprint');
+const validUI = {
+  version: 1,
+  app: {
+    name: 'TestApp',
+    description: 'A test app'
+  },
+  routes: [
+    { path: '/', page: 'home', access: 'public' },
+    { path: '/items', page: 'items-list', access: 'authenticated' },
+    { path: '/items/[id]', page: 'item-detail', access: 'authenticated' },
+    { path: '/items/create', page: 'item-create', access: { roles: ['ADMIN'], permissions: ['item:create'] } }
+  ],
+  pages: {
+    'home': {
+      layout: { header: true, navigation: true, footer: true },
+      content: [
+        { type: 'hero', title: 'Welcome to {app.name}', subtitle: '{app.description}' },
+        { type: 'entity-list', entity: 'Item', display: 'grid', limit: 6 }
+      ]
+    },
+    'items-list': {
+      layout: { header: true, navigation: true, footer: true },
+      content: [
+        { type: 'entity-list', entity: 'Item', display: 'table', title: 'All Items', fields: ['name', 'status', 'createdAt'] }
+      ]
+    },
+    'item-detail': {
+      content: [
+        { type: 'entity-detail', entity: 'Item', actions: ['edit', 'delete'] },
+        { type: 'entity-list', entity: 'Comment', filter: { field: 'itemId', value: '{item.id}' }, sort: { field: 'createdAt', direction: 'desc' } }
+      ]
+    },
+    'item-create': {
+      content: [
+        { type: 'entity-form', entity: 'Item', action: 'create', fields: ['name', 'description', 'status'] }
+      ]
+    }
+  }
+};
+const result10 = validateBlueprint(validUI, 'ui');
+console.log(result10.valid ? '✅ PASS' : '❌ FAIL');
+if (!result10.valid) {
+  console.log('Errors:', formatValidationErrors(result10.errors));
+}
+console.log('');
+
+// Test 11: Invalid UI blueprint (missing routes)
+console.log('Test 11: Invalid UI blueprint (missing routes)');
+const invalidUI = {
+  version: 1,
+  pages: {
+    'home': {
+      content: [{ type: 'hero', title: 'Hello' }]
+    }
+  }
+};
+const result11 = validateBlueprint(invalidUI, 'ui');
+console.log(!result11.valid ? '✅ PASS' : '❌ FAIL');
+if (!result11.valid) {
+  console.log('Expected errors:', formatValidationErrors(result11.errors));
+}
+console.log('');
+
+// Test 12: Validate real EduHub UI blueprint from file
+console.log('Test 12: Validate real EduHub UI blueprint');
+import { readFileSync } from 'fs';
+try {
+  const eduUI = JSON.parse(readFileSync('/Users/ctmeece/Projects/radish-cli/testapp/blueprints/testapp.ui.json', 'utf8'));
+  const result12 = validateBlueprint(eduUI, 'ui');
+  console.log(result12.valid ? '✅ PASS' : '❌ FAIL');
+  if (!result12.valid) {
+    console.log('Errors:', formatValidationErrors(result12.errors));
+  }
+} catch (err) {
+  console.log('⚠️  SKIP (file not found)');
+}
+console.log('');
+
+// Test 13: Get schemas
+console.log('Test 13: Get schemas');
 const schemas = getSchemas();
 console.log(schemas.types ? '✅ types schema loaded' : '❌ types schema missing');
 console.log(schemas.roles ? '✅ roles schema loaded' : '❌ roles schema missing');
 console.log(schemas.app ? '✅ app schema loaded' : '❌ app schema missing');
+console.log(schemas.ui ? '✅ ui schema loaded' : '❌ ui schema missing');
 console.log('');
 
 console.log('All tests completed!');

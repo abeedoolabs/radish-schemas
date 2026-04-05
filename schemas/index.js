@@ -17,6 +17,10 @@ export const appSchema = JSON.parse(
   readFileSync(join(__dirname, 'app.schema.json'), 'utf-8')
 );
 
+export const uiSchema = JSON.parse(
+  readFileSync(join(__dirname, 'ui.schema.json'), 'utf-8')
+);
+
 export function getSchema(name) {
   switch (name) {
     case 'types':
@@ -25,6 +29,8 @@ export function getSchema(name) {
       return rolesSchema;
     case 'app':
       return appSchema;
+    case 'ui':
+      return uiSchema;
     default:
       throw new Error(`Unknown schema: ${name}`);
   }

@@ -11,7 +11,8 @@
     "./prompts": "./prompts/index.js",
     "./schemas/types.schema.json": "./schemas/types.schema.json",
     "./schemas/roles.schema.json": "./schemas/roles.schema.json",
-    "./schemas/app.schema.json": "./schemas/app.schema.json"
+    "./schemas/app.schema.json": "./schemas/app.schema.json",
+    "./schemas/ui.schema.json": "./schemas/ui.schema.json"
   },
   "files": [
     "schemas/",

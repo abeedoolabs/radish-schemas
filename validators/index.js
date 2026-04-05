@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import { typesSchema, rolesSchema, appSchema } from '../schemas/index.js';
+import { typesSchema, rolesSchema, appSchema, uiSchema } from '../schemas/index.js';
 
 // Initialize AJV
 const ajv = new Ajv({ allErrors: true, strict: false });
@@ -10,13 +10,14 @@ addFormats(ajv);
 const validators = {
   types: ajv.compile(typesSchema),
   roles: ajv.compile(rolesSchema),
-  app: ajv.compile(appSchema)
+  app: ajv.compile(appSchema),
+  ui: ajv.compile(uiSchema)
 };
 
 /**
  * Validate a blueprint against its schema
  * @param {any} data - Parsed JSON data to validate
- * @param {'types' | 'roles' | 'app'} type - Schema type to validate against
+ * @param {'types' | 'roles' | 'app' | 'ui'} type - Schema type to validate against
  * @returns {{ valid: boolean, errors: Array }}
  */
 export function validateBlueprint(data, type) {
@@ -35,13 +36,14 @@ export function validateBlueprint(data, type) {
 
 /**
  * Get the raw JSON schemas
- * @returns {{ types: object, roles: object, app: object }}
+ * @returns {{ types: object, roles: object, app: object, ui: object }}
  */
 export function getSchemas() {
   return {
     types: typesSchema,
     roles: rolesSchema,
-    app: appSchema
+    app: appSchema,
+    ui: uiSchema
   };
 }
 
@@ -68,7 +70,7 @@ export function formatValidationErrors(errors) {
 /**
  * Parse a JSON string and validate against a schema
  * @param {string} jsonString - Raw JSON string to parse and validate
- * @param {'types' | 'roles' | 'app'} type - Schema type to validate against
+ * @param {'types' | 'roles' | 'app' | 'ui'} type - Schema type to validate against
  * @returns {{ valid: boolean, errors: Array, data: object|null }}
  */
 export function validateFromJSON(jsonString, type) {
@@ -166,4 +168,4 @@ function jsonToYaml(value, level, indent) {
   return String(value);
 }
 
-export { typesSchema, rolesSchema, appSchema, validators };
+export { typesSchema, rolesSchema, appSchema, uiSchema, validators };
