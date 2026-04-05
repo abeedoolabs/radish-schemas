@@ -1,6 +1,6 @@
 {
   "name": "@radish/schemas",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Shared JSON schemas, validators, and prompts for Radish CLI ecosystem",
   "main": "index.js",
   "type": "module",
