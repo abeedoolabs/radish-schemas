@@ -29,6 +29,17 @@ export function getRolesPrompt() {
 }
 
 /**
+ * Get the AI UI blueprint generation prompt
+ * @returns {string} Prompt markdown content
+ */
+export function getUiPrompt() {
+  return readFileSync(
+    join(__dirname, 'radish-ui-generation.md'),
+    'utf-8'
+  );
+}
+
+/**
  * Get the AI app blueprint generation prompt
  * @returns {string} Prompt markdown content
  */
@@ -53,7 +64,7 @@ export function getSchemaPrompt() {
 
 /**
  * Build a complete prompt with user description injected
- * @param {'app' | 'types' | 'roles'} promptType - Blueprint type to generate
+ * @param {'app' | 'types' | 'roles' | 'ui'} promptType - Blueprint type to generate
  * @param {string} description - User's app description
  * @returns {string} Complete prompt with description injected
  */
@@ -61,7 +72,8 @@ export function buildPrompt(promptType, description) {
   const prompts = {
     app: getAppPrompt,
     types: getTypesPrompt,
-    roles: getRolesPrompt
+    roles: getRolesPrompt,
+    ui: getUiPrompt
   };
 
   const getPrompt = prompts[promptType];
