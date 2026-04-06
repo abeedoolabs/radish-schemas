@@ -12,8 +12,8 @@
       </a>
     </div>
     <div class="navbar-end gap-1">
-      <a href="/schemas" class="btn btn-ghost btn-sm text-neutral-content">Schemas</a>
-      <a href="/docs" class="btn btn-ghost btn-sm text-neutral-content">API Docs</a>
+      <a href="/schemas" class="btn btn-ghost btn-sm text-white">Schemas</a>
+      <a href="/docs" class="btn btn-ghost btn-sm text-white">API Docs</a>
     </div>
   </header>
 
