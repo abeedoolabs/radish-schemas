@@ -11,7 +11,7 @@ export {
   appSchema,
   uiSchema,
   getSchema
-} from '../../index.js';
+} from '$schemas/index.js';
 
 export {
   buildPrompt,
@@ -20,4 +20,4 @@ export {
   getAppPrompt,
   getUiPrompt,
   getSchemaForPrompt
-} from '../../prompts/index.js';
+} from '$schemas/prompts/index.js';
