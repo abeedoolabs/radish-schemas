@@ -4,19 +4,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf 
 
 WORKDIR /app
 
-# Install root package (schemas, validators, prompts)
+# Copy root package (schemas, validators, prompts)
 COPY package.json package-lock.json ./
-RUN npm ci --production
-
 COPY index.js ./
 COPY schemas/ ./schemas/
 COPY validators/ ./validators/
 COPY prompts/ ./prompts/
+RUN npm ci --production
 
 # Install and build SvelteKit app
 WORKDIR /app/server
 COPY server/package.json server/package-lock.json* ./
-RUN npm ci
+RUN npm install
 COPY server/ ./
 RUN npm run build
 

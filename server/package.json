@@ -9,6 +9,9 @@
     "preview": "vite preview",
     "prepare": "svelte-kit sync || echo ''"
   },
+  "dependencies": {
+    "@radish/schemas": "file:.."
+  },
   "devDependencies": {
     "@sveltejs/adapter-node": "^5.0.0",
     "@sveltejs/kit": "^2.50.2",

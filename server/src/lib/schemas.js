@@ -1,4 +1,4 @@
-// Bridge to parent @radish/schemas package
+// Bridge to parent @radish/schemas package (installed as file:..)
 export {
   validateBlueprint,
   validateFromJSON,
@@ -11,7 +11,7 @@ export {
   appSchema,
   uiSchema,
   getSchema
-} from '$schemas/index.js';
+} from '@radish/schemas';
 
 export {
   buildPrompt,
@@ -20,4 +20,4 @@ export {
   getAppPrompt,
   getUiPrompt,
   getSchemaForPrompt
-} from '$schemas/prompts/index.js';
+} from '@radish/schemas/prompts';
