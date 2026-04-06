@@ -133,7 +133,7 @@
 
                 <details class="mt-3">
                   <summary class="text-xs text-accent cursor-pointer hover:underline">curl example</summary>
-                  <div class="mockup-code bg-neutral text-neutral-content text-xs mt-2">
+                  <div class="mockup-code bg-neutral text-white text-xs mt-2">
                     <pre class="px-4"><code>{ep.curl}</code></pre>
                   </div>
                 </details>

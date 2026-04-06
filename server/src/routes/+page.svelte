@@ -72,7 +72,7 @@
     <div class="space-y-6">
       <div>
         <h3 class="font-semibold mb-2">Validate a blueprint</h3>
-        <div class="mockup-code bg-neutral text-neutral-content text-sm">
+        <div class="mockup-code bg-neutral text-white text-sm">
           <pre><code>curl -X POST https://schemas.radishplatform.com/api/validate \
   -H "Content-Type: application/json" \
   -d '{JSON.stringify({ type: "app", data: { version: 1, app: { name: "MyApp", description: "My app" }}})}'</code></pre>
@@ -81,14 +81,14 @@
 
       <div>
         <h3 class="font-semibold mb-2">Fetch a schema</h3>
-        <div class="mockup-code bg-neutral text-neutral-content text-sm">
+        <div class="mockup-code bg-neutral text-white text-sm">
           <pre><code>curl https://schemas.radishplatform.com/api/schemas/types</code></pre>
         </div>
       </div>
 
       <div>
         <h3 class="font-semibold mb-2">Get an AI prompt</h3>
-        <div class="mockup-code bg-neutral text-neutral-content text-sm">
+        <div class="mockup-code bg-neutral text-white text-sm">
           <pre><code>curl -X POST https://schemas.radishplatform.com/api/prompts/app \
   -H "Content-Type: application/json" \
   -d '{JSON.stringify({ description: "A blog with posts and comments" })}'</code></pre>
@@ -97,7 +97,7 @@
 
       <div>
         <h3 class="font-semibold mb-2">npm package</h3>
-        <div class="mockup-code bg-neutral text-neutral-content text-sm">
+        <div class="mockup-code bg-neutral text-white text-sm">
           <pre><code>npm install @radish/schemas
 
 import {"{"} validateBlueprint, buildPrompt {"}"} from '@radish/schemas';</code></pre>

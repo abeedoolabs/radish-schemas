@@ -4,16 +4,16 @@
 </script>
 
 <div class="min-h-screen flex flex-col bg-base-100">
-  <header class="navbar bg-base-200 border-b border-base-300 px-4">
+  <header class="navbar bg-neutral text-neutral-content px-4">
     <div class="navbar-start">
       <a href="/" class="btn btn-ghost text-lg font-bold gap-2">
-        <img src="/brand/logo-schemas.svg" alt="Radish Schemas" class="w-7 h-7" />
-        <span class="text-primary">Radish Schemas</span>
+        <img src="/brand/logo-schemas.svg" alt="Radish Schemas" class="w-7 h-7 invert" />
+        <span class="text-white">Radish Schemas</span>
       </a>
     </div>
     <div class="navbar-end gap-1">
-      <a href="/schemas" class="btn btn-ghost btn-sm">Schemas</a>
-      <a href="/docs" class="btn btn-ghost btn-sm">API Docs</a>
+      <a href="/schemas" class="btn btn-ghost btn-sm text-neutral-content">Schemas</a>
+      <a href="/docs" class="btn btn-ghost btn-sm text-neutral-content">API Docs</a>
     </div>
   </header>
 

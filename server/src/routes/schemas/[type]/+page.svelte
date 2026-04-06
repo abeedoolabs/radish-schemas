@@ -79,7 +79,7 @@
     {/if}
 
     <h2 class="text-xl font-bold mb-4">Full Schema</h2>
-    <div class="mockup-code bg-neutral text-neutral-content text-xs overflow-auto max-h-[600px]">
+    <div class="mockup-code bg-neutral text-white text-xs overflow-auto max-h-[600px]">
       <pre class="px-6"><code>{data.schemaString}</code></pre>
     </div>
   </div>
