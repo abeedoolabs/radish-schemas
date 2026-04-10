@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import { typesSchema, rolesSchema, appSchema, uiSchema } from '../schemas/index.js';
+import { typesSchema, rolesSchema, appSchema, uiSchema, componentsSchema, themeSchema } from '../schemas/index.js';
 
 // Initialize AJV
 const ajv = new Ajv({ allErrors: true, strict: false });
@@ -11,13 +11,15 @@ const validators = {
   types: ajv.compile(typesSchema),
   roles: ajv.compile(rolesSchema),
   app: ajv.compile(appSchema),
-  ui: ajv.compile(uiSchema)
+  ui: ajv.compile(uiSchema),
+  components: ajv.compile(componentsSchema),
+  theme: ajv.compile(themeSchema)
 };
 
 /**
  * Validate a blueprint against its schema
  * @param {any} data - Parsed JSON data to validate
- * @param {'types' | 'roles' | 'app' | 'ui'} type - Schema type to validate against
+ * @param {'types' | 'roles' | 'app' | 'ui' | 'components' | 'theme'} type - Schema type to validate against
  * @returns {{ valid: boolean, errors: Array }}
  */
 export function validateBlueprint(data, type) {
@@ -43,7 +45,9 @@ export function getSchemas() {
     types: typesSchema,
     roles: rolesSchema,
     app: appSchema,
-    ui: uiSchema
+    ui: uiSchema,
+    components: componentsSchema,
+    theme: themeSchema
   };
 }
 
@@ -70,7 +74,7 @@ export function formatValidationErrors(errors) {
 /**
  * Parse a JSON string and validate against a schema
  * @param {string} jsonString - Raw JSON string to parse and validate
- * @param {'types' | 'roles' | 'app' | 'ui'} type - Schema type to validate against
+ * @param {'types' | 'roles' | 'app' | 'ui' | 'components' | 'theme'} type - Schema type to validate against
  * @returns {{ valid: boolean, errors: Array, data: object|null }}
  */
 export function validateFromJSON(jsonString, type) {
@@ -168,4 +172,4 @@ function jsonToYaml(value, level, indent) {
   return String(value);
 }
 
-export { typesSchema, rolesSchema, appSchema, uiSchema, validators };
+export { typesSchema, rolesSchema, appSchema, uiSchema, componentsSchema, themeSchema, validators };

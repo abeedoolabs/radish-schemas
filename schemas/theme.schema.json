@@ -1,0 +1,196 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://radish.dev/schemas/theme.schema.json",
+  "title": "Radish Theme Blueprint",
+  "description": "Schema for defining DaisyUI v5 design tokens including colors, typography, border radius, and background definitions.",
+  "type": "object",
+  "required": [
+    "version",
+    "theme"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Blueprint spec version"
+    },
+    "theme": {
+      "type": "object",
+      "description": "Theme definition with design tokens",
+      "required": [
+        "name",
+        "colorScheme",
+        "colors"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "Theme identifier (lowercase, no spaces)"
+        },
+        "colorScheme": {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark"
+          ],
+          "description": "Base color scheme"
+        },
+        "colors": {
+          "type": "object",
+          "description": "DaisyUI color tokens (hex values)",
+          "required": [
+            "primary",
+            "secondary",
+            "accent",
+            "neutral",
+            "base100",
+            "base200",
+            "base300",
+            "info",
+            "success",
+            "warning",
+            "error"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "primary": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Primary brand color"
+            },
+            "secondary": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Secondary color"
+            },
+            "accent": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Accent color for contrast"
+            },
+            "neutral": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Neutral color for text and borders"
+            },
+            "base100": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Main background color"
+            },
+            "base200": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Subtle background variation"
+            },
+            "base300": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Strongest background variation"
+            },
+            "info": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Info status color"
+            },
+            "success": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Success status color"
+            },
+            "warning": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Warning status color"
+            },
+            "error": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$",
+              "description": "Error status color"
+            }
+          }
+        },
+        "typography": {
+          "type": "object",
+          "description": "Font settings",
+          "additionalProperties": false,
+          "properties": {
+            "fontFamily": {
+              "type": "string",
+              "description": "Primary font family (e.g., 'Inter, sans-serif')"
+            },
+            "headingFont": {
+              "type": "string",
+              "description": "Heading font family (e.g., 'Poppins, sans-serif')"
+            }
+          }
+        },
+        "radius": {
+          "type": "object",
+          "description": "Border radius tokens (CSS rem values)",
+          "additionalProperties": false,
+          "properties": {
+            "box": {
+              "type": "string",
+              "description": "Border radius for cards and containers (e.g., '0.5rem')"
+            },
+            "button": {
+              "type": "string",
+              "description": "Border radius for buttons (e.g., '0.25rem')"
+            },
+            "badge": {
+              "type": "string",
+              "description": "Border radius for badges (e.g., '1rem')"
+            }
+          }
+        },
+        "backgrounds": {
+          "type": "object",
+          "description": "Named background definitions for page sections",
+          "patternProperties": {
+            "^[a-zA-Z][a-zA-Z0-9]*$": {
+              "$ref": "#/definitions/background"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "definitions": {
+    "background": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "solid",
+            "gradient",
+            "image"
+          ],
+          "description": "Background type"
+        },
+        "color": {
+          "type": "string",
+          "description": "Solid background color (hex or CSS value)"
+        },
+        "gradient": {
+          "type": "string",
+          "description": "CSS gradient value (e.g., 'linear-gradient(135deg, #334155, #4f46e5)')"
+        },
+        "url": {
+          "type": "string",
+          "description": "Background image URL"
+        }
+      }
+    }
+  }
+}

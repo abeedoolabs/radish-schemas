@@ -21,6 +21,14 @@ export const uiSchema = JSON.parse(
   readFileSync(join(__dirname, 'ui.schema.json'), 'utf-8')
 );
 
+export const componentsSchema = JSON.parse(
+  readFileSync(join(__dirname, 'components.schema.json'), 'utf-8')
+);
+
+export const themeSchema = JSON.parse(
+  readFileSync(join(__dirname, 'theme.schema.json'), 'utf-8')
+);
+
 export function getSchema(name) {
   switch (name) {
     case 'types':
@@ -31,6 +39,10 @@ export function getSchema(name) {
       return appSchema;
     case 'ui':
       return uiSchema;
+    case 'components':
+      return componentsSchema;
+    case 'theme':
+      return themeSchema;
     default:
       throw new Error(`Unknown schema: ${name}`);
   }

@@ -40,6 +40,28 @@ export function getUiPrompt() {
 }
 
 /**
+ * Get the AI components blueprint generation prompt
+ * @returns {string} Prompt markdown content
+ */
+export function getComponentsPrompt() {
+  return readFileSync(
+    join(__dirname, 'radish-components-generation.md'),
+    'utf-8'
+  );
+}
+
+/**
+ * Get the AI theme blueprint generation prompt
+ * @returns {string} Prompt markdown content
+ */
+export function getThemePrompt() {
+  return readFileSync(
+    join(__dirname, 'radish-theme-generation.md'),
+    'utf-8'
+  );
+}
+
+/**
  * Get the AI app blueprint generation prompt
  * @returns {string} Prompt markdown content
  */
@@ -64,7 +86,7 @@ export function getSchemaPrompt() {
 
 /**
  * Build a complete prompt with user description injected
- * @param {'app' | 'types' | 'roles' | 'ui'} promptType - Blueprint type to generate
+ * @param {'app' | 'types' | 'roles' | 'ui' | 'components' | 'theme'} promptType - Blueprint type to generate
  * @param {string} description - User's app description
  * @returns {string} Complete prompt with description injected
  */
@@ -73,7 +95,9 @@ export function buildPrompt(promptType, description) {
     app: getAppPrompt,
     types: getTypesPrompt,
     roles: getRolesPrompt,
-    ui: getUiPrompt
+    ui: getUiPrompt,
+    components: getComponentsPrompt,
+    theme: getThemePrompt
   };
 
   const getPrompt = prompts[promptType];

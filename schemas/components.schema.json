@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://radish.dev/schemas/components.schema.json",
+  "title": "Radish Components Blueprint",
+  "description": "Schema for mapping named UI components to @radish/components primitives. Each component defines a base primitive, optional entity binding, field mappings, display modes, and actions.",
+  "type": "object",
+  "required": [
+    "version",
+    "components"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Blueprint spec version"
+    },
+    "components": {
+      "type": "object",
+      "description": "Component definitions keyed by component name",
+      "minProperties": 1,
+      "patternProperties": {
+        "^[A-Z][A-Za-z0-9]*$": {
+          "$ref": "#/definitions/component"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "component": {
+      "type": "object",
+      "required": [
+        "base"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "base": {
+          "type": "string",
+          "description": "The @radish/components primitive to compose",
+          "enum": [
+            "Button",
+            "Dropdown",
+            "Swap",
+            "ThemeController",
+            "AutoForm",
+            "ChatPanel",
+            "ConfirmDialog",
+            "DataTable",
+            "EmptyState",
+            "Icon",
+            "Modal",
+            "PageHeader",
+            "Tabs",
+            "Accordion",
+            "Avatar",
+            "Badge",
+            "Carousel",
+            "ChatBubble",
+            "CodeBlock",
+            "Collapse",
+            "Countdown",
+            "Kbd",
+            "List",
+            "Stat",
+            "StatGroup",
+            "Status",
+            "Table",
+            "Timeline",
+            "Calendar",
+            "Checkbox",
+            "DateRangeInput",
+            "DropZone",
+            "FileInput",
+            "FormField",
+            "Radio",
+            "Range",
+            "Rating",
+            "SearchInput",
+            "Select",
+            "TextInput",
+            "Textarea",
+            "Toggle",
+            "Alert",
+            "Loading",
+            "Progress",
+            "RadialProgress",
+            "Skeleton",
+            "Toast",
+            "Tooltip",
+            "Card",
+            "Divider",
+            "Drawer",
+            "Footer",
+            "Hero",
+            "Stack",
+            "Breadcrumbs",
+            "Dock",
+            "Link",
+            "Menu",
+            "Navbar",
+            "Pagination",
+            "Steps",
+            "ContentBlock"
+          ]
+        },
+        "entity": {
+          "type": "string",
+          "description": "Entity name from types blueprint to bind this component to (PascalCase)",
+          "pattern": "^[A-Z][A-Za-z0-9]*$"
+        },
+        "fields": {
+          "type": "object",
+          "description": "Map component slots (title, body, badge, subtitle, image, etc.) to entity field names",
+          "patternProperties": {
+            "^[a-zA-Z][a-zA-Z0-9]*$": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "columns": {
+          "type": "array",
+          "description": "Entity fields to display as columns in table/grid views",
+          "items": {
+            "type": "string"
+          }
+        },
+        "display": {
+          "type": "string",
+          "enum": [
+            "table",
+            "grid",
+            "preview"
+          ],
+          "description": "Display mode for list/data components"
+        },
+        "cardComponent": {
+          "type": "string",
+          "description": "Reference to another component definition to use as the card renderer in grid display",
+          "pattern": "^[A-Z][A-Za-z0-9]*$"
+        },
+        "props": {
+          "type": "object",
+          "description": "Static property values for non-entity components (e.g., hero title, button label)",
+          "additionalProperties": true
+        },
+        "actions": {
+          "type": "array",
+          "description": "Action buttons to render with the component",
+          "items": {
+            "$ref": "#/definitions/action"
+          }
+        },
+        "editable": {
+          "type": "boolean",
+          "description": "Whether this is a CMS-backed editable content block"
+        },
+        "defaultContent": {
+          "type": "string",
+          "description": "Default HTML content for editable content blocks"
+        }
+      }
+    },
+    "action": {
+      "type": "object",
+      "required": [
+        "label"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Button label text"
+        },
+        "href": {
+          "type": "string",
+          "description": "Link target. Supports interpolation with entity fields (e.g., /courses/{id})"
+        },
+        "variant": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "accent",
+            "ghost",
+            "link",
+            "outline"
+          ],
+          "description": "Button style variant"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Icon name to display on the button"
+        }
+      }
+    }
+  }
+}

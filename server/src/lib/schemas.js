@@ -10,6 +10,8 @@ export {
   rolesSchema,
   appSchema,
   uiSchema,
+  componentsSchema,
+  themeSchema,
   getSchema
 } from '@radish/schemas';
 
@@ -19,5 +21,7 @@ export {
   getRolesPrompt,
   getAppPrompt,
   getUiPrompt,
+  getComponentsPrompt,
+  getThemePrompt,
   getSchemaForPrompt
 } from '@radish/schemas/prompts';

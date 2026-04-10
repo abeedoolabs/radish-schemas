@@ -1,5 +1,5 @@
 // Main entry point for @radish/schemas
-export { typesSchema, rolesSchema, appSchema, uiSchema, getSchema } from './schemas/index.js';
+export { typesSchema, rolesSchema, appSchema, uiSchema, componentsSchema, themeSchema, getSchema } from './schemas/index.js';
 export {
   validateBlueprint,
   validateFromJSON,
@@ -13,6 +13,8 @@ export {
   getRolesPrompt,
   getAppPrompt,
   getUiPrompt,
+  getComponentsPrompt,
+  getThemePrompt,
   getSchemaPrompt,  // deprecated: use getTypesPrompt/getRolesPrompt
   buildPrompt,
   getSchemaForPrompt
@@ -29,7 +31,7 @@ export {
  * @property {string} minCliVersion - Minimum radish-cli version compatible with this package
  */
 export const VERSIONING = {
-  packageVersion: '1.6.0',
+  packageVersion: '1.7.0',
   currentSpecVersion: 1,
   supportedSpecVersions: [1],
   minCliVersion: '0.1.0'

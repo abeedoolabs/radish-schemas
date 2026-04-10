@@ -275,13 +275,152 @@ try {
 }
 console.log('');
 
-// Test 13: Get schemas
-console.log('Test 13: Get schemas');
+// Test 13: Valid components blueprint
+console.log('Test 13: Valid components blueprint');
+const validComponents = {
+  version: 1,
+  components: {
+    HeroSection: {
+      base: 'Hero',
+      props: { title: 'Welcome', subtitle: 'Build something' }
+    },
+    ItemCard: {
+      base: 'Card',
+      entity: 'Item',
+      fields: { title: 'name', body: 'description', badge: 'status' },
+      actions: [
+        { label: 'View', href: '/items/{id}', variant: 'primary' }
+      ]
+    },
+    ItemTable: {
+      base: 'DataTable',
+      entity: 'Item',
+      display: 'table',
+      columns: ['name', 'status', 'createdAt']
+    },
+    ItemGrid: {
+      base: 'DataTable',
+      entity: 'Item',
+      display: 'grid',
+      cardComponent: 'ItemCard'
+    },
+    AboutBlock: {
+      base: 'ContentBlock',
+      editable: true,
+      defaultContent: '<h2>About</h2><p>Learn more.</p>'
+    }
+  }
+};
+const result13 = validateBlueprint(validComponents, 'components');
+console.log(result13.valid ? '✅ PASS' : '❌ FAIL');
+if (!result13.valid) {
+  console.log('Errors:', formatValidationErrors(result13.errors));
+}
+console.log('');
+
+// Test 14: Invalid components blueprint (missing base)
+console.log('Test 14: Invalid components blueprint (missing base)');
+const invalidComponents = {
+  version: 1,
+  components: {
+    BadComponent: {
+      entity: 'Item'
+    }
+  }
+};
+const result14 = validateBlueprint(invalidComponents, 'components');
+console.log(!result14.valid ? '✅ PASS' : '❌ FAIL');
+if (!result14.valid) {
+  console.log('Expected errors:', formatValidationErrors(result14.errors));
+}
+console.log('');
+
+// Test 15: Valid theme blueprint
+console.log('Test 15: Valid theme blueprint');
+const validTheme = {
+  version: 1,
+  theme: {
+    name: 'test-theme',
+    colorScheme: 'light',
+    colors: {
+      primary: '#2563eb',
+      secondary: '#1e40af',
+      accent: '#f59e0b',
+      neutral: '#1e293b',
+      base100: '#ffffff',
+      base200: '#f8fafc',
+      base300: '#e2e8f0',
+      info: '#3b82f6',
+      success: '#22c55e',
+      warning: '#eab308',
+      error: '#ef4444'
+    },
+    typography: {
+      fontFamily: 'Inter, sans-serif',
+      headingFont: 'Poppins, sans-serif'
+    },
+    radius: {
+      box: '0.5rem',
+      button: '0.375rem',
+      badge: '1rem'
+    },
+    backgrounds: {
+      hero: {
+        type: 'gradient',
+        gradient: 'linear-gradient(135deg, #2563eb, #1e40af)'
+      },
+      page: {
+        type: 'solid',
+        color: '#ffffff'
+      }
+    }
+  }
+};
+const result15 = validateBlueprint(validTheme, 'theme');
+console.log(result15.valid ? '✅ PASS' : '❌ FAIL');
+if (!result15.valid) {
+  console.log('Errors:', formatValidationErrors(result15.errors));
+}
+console.log('');
+
+// Test 16: Invalid theme blueprint (bad hex color)
+console.log('Test 16: Invalid theme blueprint (bad hex color)');
+const invalidTheme = {
+  version: 1,
+  theme: {
+    name: 'bad-theme',
+    colorScheme: 'light',
+    colors: {
+      primary: 'red',
+      secondary: '#1e40af',
+      accent: '#f59e0b',
+      neutral: '#1e293b',
+      base100: '#ffffff',
+      base200: '#f8fafc',
+      base300: '#e2e8f0',
+      info: '#3b82f6',
+      success: '#22c55e',
+      warning: '#eab308',
+      error: '#ef4444'
+    }
+  }
+};
+const result16 = validateBlueprint(invalidTheme, 'theme');
+console.log(!result16.valid ? '✅ PASS' : '❌ FAIL');
+if (!result16.valid) {
+  console.log('Expected errors:', formatValidationErrors(result16.errors));
+}
+console.log('');
+
+// Test 17: Get schemas
+console.log('Test 17: Get schemas');
 const schemas = getSchemas();
 console.log(schemas.types ? '✅ types schema loaded' : '❌ types schema missing');
 console.log(schemas.roles ? '✅ roles schema loaded' : '❌ roles schema missing');
 console.log(schemas.app ? '✅ app schema loaded' : '❌ app schema missing');
 console.log(schemas.ui ? '✅ ui schema loaded' : '❌ ui schema missing');
+console.log(schemas.components ? '✅ components schema loaded' : '❌ components schema missing');
+console.log(schemas.theme ? '✅ theme schema loaded' : '❌ theme schema missing');
 console.log('');
 
 console.log('All tests completed!');
