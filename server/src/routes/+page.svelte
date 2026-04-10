@@ -23,6 +23,18 @@
       name: 'UI Blueprint',
       description: 'Routes, pages, layouts, and content blocks for UI generation.',
       file: 'ui.schema.json'
+    },
+    {
+      type: 'components',
+      name: 'Components Blueprint',
+      description: 'Maps UI components to @radish/components primitives with entity bindings and field mappings.',
+      file: 'components.schema.json'
+    },
+    {
+      type: 'theme',
+      name: 'Theme Blueprint',
+      description: 'DaisyUI v5 design tokens: colors, typography, border radius, and backgrounds.',
+      file: 'theme.schema.json'
     }
   ];
 </script>

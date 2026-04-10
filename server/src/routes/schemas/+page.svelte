@@ -3,7 +3,9 @@
     { type: 'app', name: 'App Blueprint', description: 'Master application document defining audience, workflows, features, entity overview, and access patterns.', required: ['version', 'app'] },
     { type: 'types', name: 'Types Blueprint', description: 'Data layer entities with fields, relationships, indexes, filters, and validation rules.', required: ['version', 'entities'] },
     { type: 'roles', name: 'Roles Blueprint', description: 'User roles with labels, descriptions, system flags, and permission arrays.', required: ['version', 'roles'] },
-    { type: 'ui', name: 'UI Blueprint', description: 'Routes, pages, layouts, and content blocks for UI generation.', required: ['version', 'routes', 'pages'] }
+    { type: 'ui', name: 'UI Blueprint', description: 'Routes, pages, layouts, and content blocks for UI generation.', required: ['version', 'routes', 'pages'] },
+    { type: 'components', name: 'Components Blueprint', description: 'Maps UI components to @radish/components primitives with entity bindings and field mappings.', required: ['version', 'components'] },
+    { type: 'theme', name: 'Theme Blueprint', description: 'DaisyUI v5 design tokens: colors, typography, border radius, and backgrounds.', required: ['version', 'theme'] }
   ];
 </script>
 

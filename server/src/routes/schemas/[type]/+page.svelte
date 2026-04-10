@@ -5,7 +5,9 @@
     app: 'App Blueprint Schema',
     types: 'Types Blueprint Schema',
     roles: 'Roles Blueprint Schema',
-    ui: 'UI Blueprint Schema'
+    ui: 'UI Blueprint Schema',
+    components: 'Components Blueprint Schema',
+    theme: 'Theme Blueprint Schema'
   };
 
   function downloadSchema() {

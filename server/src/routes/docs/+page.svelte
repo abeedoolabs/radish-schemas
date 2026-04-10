@@ -78,7 +78,7 @@
     }
   ];
 
-  const types = ['app', 'types', 'roles', 'ui'];
+  const types = ['app', 'types', 'roles', 'ui', 'components', 'theme'];
 </script>
 
 <svelte:head>
