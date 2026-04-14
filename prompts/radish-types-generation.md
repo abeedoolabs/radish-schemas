@@ -64,7 +64,7 @@ The following entities are already provided by the system. DO NOT recreate them 
    }
    ```
 
-3. **Field Types**: string, int, float, boolean, isoDate, objectId, string[], objectId[], enum, object, array, url, secretKey, encryptedKey
+3. **Field Types**: string, int, float, boolean, isoDate, objectId, string[], int[], float[], boolean[], objectId[], url[], enum, object, array, url, secretKey, encryptedKey
 
 4. **Field Exposure** (optional): Control field visibility in generated APIs/contracts:
    ```json
@@ -100,6 +100,23 @@ The following entities are already provided by the system. DO NOT recreate them 
    ```
 
 8. **Performance**: Add `filters` array for searchable fields and `indexes` for performance
+
+9. **Nested Objects**: Use `"type": "object"` with `"fields"` for nested structures:
+   ```json
+   {
+     "type": "object",
+     "label": "Location",
+     "fields": {
+       "latitude": { "type": "float" },
+       "longitude": { "type": "float" }
+     }
+   }
+   ```
+
+10. **Automatic Fields** (DO NOT add these manually):
+    - When `"defaults": { "timestamps": true }` is set, `createdAt` and `updatedAt` are added automatically
+    - When `"defaults": { "owned": true }` is set, `ownerId` is added automatically
+    - Adding these fields manually causes duplication
 
 ## Extension Examples
 
@@ -201,3 +218,7 @@ You MUST respond with ONLY a valid JSON object starting with `{ "version": 1, "e
 - Forgetting `"plural"` field on entities
 - Putting User extensions outside the `entities` object
 - Creating auth-related entities that already exist builtin
+- Adding `createdAt`/`updatedAt` fields when `timestamps: true` is set (they're automatic)
+- Adding `ownerId` fields when `owned: true` is set (it's automatic)
+- Using `"shape"` instead of `"fields"` for nested object definitions
+- Inventing field types that don't exist (e.g., `"date"` — use `"isoDate"`)
