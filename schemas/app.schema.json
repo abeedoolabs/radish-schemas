@@ -169,8 +169,10 @@
     },
     "features": {
       "type": "object",
-      "description": "Feature flags indicating what capabilities this app includes",
-      "additionalProperties": false,
+      "description": "Feature flags indicating what capabilities this app includes. Additional boolean flags are allowed for future features.",
+      "additionalProperties": {
+        "type": "boolean"
+      },
       "properties": {
         "auth": {
           "type": "boolean",
@@ -215,6 +217,14 @@
         "logging": {
           "type": "boolean",
           "description": "Application logging"
+        },
+        "cms": {
+          "type": "boolean",
+          "description": "CMS content management (ContentBlock, MediaAsset entities)"
+        },
+        "grants": {
+          "type": "boolean",
+          "description": "Grant-based access control (Grant entity for fine-grained permissions)"
         }
       }
     },
