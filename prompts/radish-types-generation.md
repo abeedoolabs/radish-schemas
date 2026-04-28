@@ -87,7 +87,24 @@ The following entities are already provided by the system. DO NOT recreate them 
 
 6. **Relationships**: Use `{ "type": "objectId", "ref": "EntityName" }` for references
 
-7. **Enhanced Enums**: Use key-value pairs for better UX:
+7. **Scope** (optional): For relationship-based access control — allows access if the user owns a related entity:
+   ```json
+   {
+     "Subscription": {
+       "plural": "subscriptions",
+       "ownership": "system",
+       "scope": {
+         "field": "appId",
+         "through": "App",
+         "ownerField": "ownerId"
+       },
+       "fields": { ... }
+     }
+   }
+   ```
+   This means: "a user can access this Subscription if they own the App referenced by `appId`." Use `scope` when an entity is system-owned but access depends on ownership of a related entity.
+
+8. **Enhanced Enums**: Use key-value pairs for better UX:
    ```json
    {
      "type": "enum",
@@ -99,9 +116,9 @@ The following entities are already provided by the system. DO NOT recreate them 
    }
    ```
 
-8. **Performance**: Add `filters` array for searchable fields and `indexes` for performance
+9. **Performance**: Add `filters` array for searchable fields and `indexes` for performance
 
-9. **Nested Objects**: Use `"type": "object"` with `"fields"` for nested structures:
+10. **Nested Objects**: Use `"type": "object"` with `"fields"` for nested structures:
    ```json
    {
      "type": "object",
@@ -113,7 +130,7 @@ The following entities are already provided by the system. DO NOT recreate them 
    }
    ```
 
-10. **Automatic Fields** (DO NOT add these manually):
+11. **Automatic Fields** (DO NOT add these manually):
     - When `"defaults": { "timestamps": true }` is set, `createdAt` and `updatedAt` are added automatically
     - When `"defaults": { "owned": true }` is set, `ownerId` is added automatically
     - Adding these fields manually causes duplication

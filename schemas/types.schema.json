@@ -63,6 +63,27 @@
               "description": "Base type to extend from. Can be EntityBase, SystemEntityBase, ContentBase, or another entity name.",
               "pattern": "^([A-Z][A-Za-z0-9_]*|EntityBase|SystemEntityBase|ContentBase)$"
             },
+            "scope": {
+              "type": "object",
+              "description": "Relationship-based access control. Defines how ownership is checked through a related entity.",
+              "required": ["field", "through"],
+              "additionalProperties": false,
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "description": "Field on this entity that references the related entity (e.g., 'appId')"
+                },
+                "through": {
+                  "type": "string",
+                  "description": "The related entity model name to check ownership against (e.g., 'App')"
+                },
+                "ownerField": {
+                  "type": "string",
+                  "default": "ownerId",
+                  "description": "Field on the related entity that identifies the owner (defaults to 'ownerId')"
+                }
+              }
+            },
             "collation": {
               "type": "object",
               "description": "MongoDB collation settings for this collection",

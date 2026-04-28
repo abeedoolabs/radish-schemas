@@ -70,7 +70,34 @@ if (!result3.valid) {
 }
 console.log('');
 
-// Test 4: Valid app blueprint
+// Test 4: Valid types blueprint with scope
+console.log('Test 4: Types blueprint with scope');
+const scopedBlueprint = {
+  version: 1,
+  entities: {
+    Subscription: {
+      plural: 'subscriptions',
+      ownership: 'system',
+      scope: {
+        field: 'appId',
+        through: 'App',
+        ownerField: 'ownerId'
+      },
+      fields: {
+        appId: { type: 'objectId', ref: 'App', required: true },
+        plan: { type: 'string', required: true }
+      }
+    }
+  }
+};
+const resultScope = validateBlueprint(scopedBlueprint, 'types');
+console.log(resultScope.valid ? '✅ PASS' : '❌ FAIL');
+if (!resultScope.valid) {
+  console.log('Errors:', formatValidationErrors(resultScope.errors));
+}
+console.log('');
+
+// Test 5: Valid app blueprint
 console.log('Test 4: Valid app blueprint');
 const validApp = {
   version: 1,
