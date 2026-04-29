@@ -97,6 +97,35 @@ if (!resultScope.valid) {
 }
 console.log('');
 
+// Test 4b: Types blueprint with field-level access control
+console.log('Test 4b: Types blueprint with field-level access');
+const accessBlueprint = {
+  version: 1,
+  entities: {
+    Product: {
+      plural: 'products',
+      fields: {
+        name: { type: 'string', required: true },
+        price: { type: 'float', required: true },
+        costPrice: {
+          type: 'float',
+          access: { read: ['ADMIN', 'MANAGER'] }
+        },
+        supplierNotes: {
+          type: 'string',
+          access: { read: ['ADMIN', 'MANAGER'], write: ['ADMIN'] }
+        }
+      }
+    }
+  }
+};
+const resultAccess = validateBlueprint(accessBlueprint, 'types');
+console.log(resultAccess.valid ? '✅ PASS' : '❌ FAIL');
+if (!resultAccess.valid) {
+  console.log('Errors:', formatValidationErrors(resultAccess.errors));
+}
+console.log('');
+
 // Test 5: Valid app blueprint
 console.log('Test 4: Valid app blueprint');
 const validApp = {

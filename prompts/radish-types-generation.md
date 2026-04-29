@@ -79,15 +79,30 @@ The following entities are already provided by the system. DO NOT recreate them 
    }
    ```
 
-5. **Required Entity Properties**:
+5. **Field-Level Access Control** (optional): Restrict which roles can read or write specific fields:
+   ```json
+   {
+     "costPrice": {
+       "type": "float",
+       "access": { "read": ["ADMIN", "MANAGER"] }
+     },
+     "supplierNotes": {
+       "type": "string",
+       "access": { "read": ["ADMIN", "MANAGER"], "write": ["ADMIN"] }
+     }
+   }
+   ```
+   If `access` is omitted, the field is visible/writable to anyone with entity access. ADMIN with `system:admin` bypasses all field restrictions.
+
+6. **Required Entity Properties**:
    - `label`: Human-readable name
    - `description`: What this entity represents
    - `plural`: Plural form for collections
    - `fields`: Object defining all fields
 
-6. **Relationships**: Use `{ "type": "objectId", "ref": "EntityName" }` for references
+7. **Relationships**: Use `{ "type": "objectId", "ref": "EntityName" }` for references
 
-7. **Scope** (optional): For relationship-based access control — allows access if the user owns a related entity:
+8. **Scope** (optional): For relationship-based access control — allows access if the user owns a related entity:
    ```json
    {
      "Subscription": {
@@ -104,7 +119,7 @@ The following entities are already provided by the system. DO NOT recreate them 
    ```
    This means: "a user can access this Subscription if they own the App referenced by `appId`." Use `scope` when an entity is system-owned but access depends on ownership of a related entity.
 
-8. **Enhanced Enums**: Use key-value pairs for better UX:
+9. **Enhanced Enums**: Use key-value pairs for better UX:
    ```json
    {
      "type": "enum",
@@ -116,9 +131,9 @@ The following entities are already provided by the system. DO NOT recreate them 
    }
    ```
 
-9. **Performance**: Add `filters` array for searchable fields and `indexes` for performance
+10. **Performance**: Add `filters` array for searchable fields and `indexes` for performance
 
-10. **Nested Objects**: Use `"type": "object"` with `"fields"` for nested structures:
+11. **Nested Objects**: Use `"type": "object"` with `"fields"` for nested structures:
    ```json
    {
      "type": "object",
@@ -130,7 +145,7 @@ The following entities are already provided by the system. DO NOT recreate them 
    }
    ```
 
-11. **Automatic Fields** (DO NOT add these manually):
+12. **Automatic Fields** (DO NOT add these manually):
     - When `"defaults": { "timestamps": true }` is set, `createdAt` and `updatedAt` are added automatically
     - When `"defaults": { "owned": true }` is set, `ownerId` is added automatically
     - Adding these fields manually causes duplication

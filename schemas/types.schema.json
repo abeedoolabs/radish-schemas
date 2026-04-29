@@ -308,6 +308,23 @@
                         }
                       },
                       "additionalProperties": false
+                    },
+                    "access": {
+                      "type": "object",
+                      "description": "Field-level access control. Restricts which roles can read or write this field.",
+                      "additionalProperties": false,
+                      "properties": {
+                        "read": {
+                          "type": "array",
+                          "items": { "type": "string" },
+                          "description": "Roles that can read this field. If omitted, visible to anyone with entity access."
+                        },
+                        "write": {
+                          "type": "array",
+                          "items": { "type": "string" },
+                          "description": "Roles that can write this field. If omitted, writable by anyone with entity write access."
+                        }
+                      }
                     }
                   },
                   "allOf": [
@@ -647,6 +664,23 @@
             }
           },
           "additionalProperties": false
+        },
+        "access": {
+          "type": "object",
+          "description": "Field-level access control. Restricts which roles can read or write this field.",
+          "additionalProperties": false,
+          "properties": {
+            "read": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Roles that can read this field. If omitted, visible to anyone with entity access."
+            },
+            "write": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Roles that can write this field. If omitted, writable by anyone with entity write access."
+            }
+          }
         }
       }
     }
