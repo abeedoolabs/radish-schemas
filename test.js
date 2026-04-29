@@ -126,6 +126,40 @@ if (!resultAccess.valid) {
 }
 console.log('');
 
+// Test 4c: Types blueprint with search index
+console.log('Test 4c: Types blueprint with search index');
+const searchBlueprint = {
+  version: 1,
+  entities: {
+    Product: {
+      plural: 'products',
+      search: {
+        enabled: true,
+        engine: 'typesense',
+        fields: {
+          searchable: ['name', 'description', 'brand'],
+          filterable: ['brand', 'price', 'categories'],
+          sortable: ['price', 'name', 'createdAt'],
+          facetable: ['brand', 'categories']
+        }
+      },
+      fields: {
+        name: { type: 'string', required: true },
+        description: { type: 'string' },
+        brand: { type: 'string' },
+        price: { type: 'float' },
+        categories: { type: 'string[]' }
+      }
+    }
+  }
+};
+const resultSearch = validateBlueprint(searchBlueprint, 'types');
+console.log(resultSearch.valid ? '✅ PASS' : '❌ FAIL');
+if (!resultSearch.valid) {
+  console.log('Errors:', formatValidationErrors(resultSearch.errors));
+}
+console.log('');
+
 // Test 5: Valid app blueprint
 console.log('Test 4: Valid app blueprint');
 const validApp = {

@@ -84,6 +84,51 @@
                 }
               }
             },
+            "search": {
+              "type": "object",
+              "description": "Search index configuration for this entity. Generates search adapters and typed search index classes.",
+              "required": ["enabled"],
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Whether search indexing is enabled for this entity"
+                },
+                "engine": {
+                  "type": "string",
+                  "enum": ["typesense", "meilisearch", "elasticsearch"],
+                  "default": "typesense",
+                  "description": "Search engine to use"
+                },
+                "fields": {
+                  "type": "object",
+                  "description": "Field classifications for search behavior",
+                  "additionalProperties": false,
+                  "properties": {
+                    "searchable": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Fields included in full-text search queries"
+                    },
+                    "filterable": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Fields available as filter criteria"
+                    },
+                    "sortable": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Fields available for sort ordering"
+                    },
+                    "facetable": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Fields available as faceted navigation"
+                    }
+                  }
+                }
+              }
+            },
             "collation": {
               "type": "object",
               "description": "MongoDB collation settings for this collection",

@@ -145,7 +145,28 @@ The following entities are already provided by the system. DO NOT recreate them 
    }
    ```
 
-12. **Automatic Fields** (DO NOT add these manually):
+12. **Search Index** (optional): Enable full-text search with engine-specific adapters:
+    ```json
+    {
+      "Product": {
+        "plural": "products",
+        "search": {
+          "enabled": true,
+          "engine": "typesense",
+          "fields": {
+            "searchable": ["name", "description", "brand"],
+            "filterable": ["brand", "price", "categories"],
+            "sortable": ["price", "name", "createdAt"],
+            "facetable": ["brand", "categories"]
+          }
+        },
+        "fields": { ... }
+      }
+    }
+    ```
+    Generates typed search index classes and engine adapters. Supported engines: `typesense`, `meilisearch`, `elasticsearch`.
+
+13. **Automatic Fields** (DO NOT add these manually):
     - When `"defaults": { "timestamps": true }` is set, `createdAt` and `updatedAt` are added automatically
     - When `"defaults": { "owned": true }` is set, `ownerId` is added automatically
     - Adding these fields manually causes duplication
