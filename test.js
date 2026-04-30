@@ -136,11 +136,17 @@ const searchBlueprint = {
       search: {
         enabled: true,
         engine: 'typesense',
+        indexName: 'products',
         fields: {
           searchable: ['name', 'description', 'brand'],
           filterable: ['brand', 'price', 'categories'],
           sortable: ['price', 'name', 'createdAt'],
           facetable: ['brand', 'categories']
+        },
+        sync: 'inline',
+        vector: {
+          enabled: false,
+          sourceFields: ['name', 'description']
         }
       },
       fields: {

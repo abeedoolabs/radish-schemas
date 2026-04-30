@@ -92,13 +92,16 @@
               "properties": {
                 "enabled": {
                   "type": "boolean",
-                  "description": "Whether search indexing is enabled for this entity"
+                  "description": "Enable search indexing for this entity"
                 },
                 "engine": {
                   "type": "string",
-                  "enum": ["typesense", "meilisearch", "elasticsearch"],
-                  "default": "typesense",
+                  "enum": ["typesense", "elastic", "opensearch", "meilisearch", "mongoAtlas"],
                   "description": "Search engine to use"
+                },
+                "indexName": {
+                  "type": "string",
+                  "description": "Name of the search index (defaults to entity plural)"
                 },
                 "fields": {
                   "type": "object",
@@ -124,6 +127,27 @@
                       "type": "array",
                       "items": { "type": "string" },
                       "description": "Fields available as faceted navigation"
+                    }
+                  }
+                },
+                "sync": {
+                  "type": "string",
+                  "enum": ["inline", "background"],
+                  "description": "Sync mode: inline (immediate) or background (via jobs)"
+                },
+                "vector": {
+                  "type": "object",
+                  "description": "Vector/embedding search configuration",
+                  "additionalProperties": false,
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "description": "Enable vector search for this entity"
+                    },
+                    "sourceFields": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "Fields to generate embeddings from"
                     }
                   }
                 }

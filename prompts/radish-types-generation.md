@@ -153,18 +153,27 @@ The following entities are already provided by the system. DO NOT recreate them 
         "search": {
           "enabled": true,
           "engine": "typesense",
+          "indexName": "products",
           "fields": {
             "searchable": ["name", "description", "brand"],
             "filterable": ["brand", "price", "categories"],
             "sortable": ["price", "name", "createdAt"],
             "facetable": ["brand", "categories"]
+          },
+          "sync": "inline",
+          "vector": {
+            "enabled": false,
+            "sourceFields": ["name", "description"]
           }
         },
         "fields": { ... }
       }
     }
     ```
-    Generates typed search index classes and engine adapters. Supported engines: `typesense`, `meilisearch`, `elasticsearch`.
+    - **engine**: `typesense`, `elastic`, `opensearch`, `meilisearch`, `mongoAtlas`
+    - **indexName**: Custom index name (defaults to entity plural)
+    - **sync**: `inline` (immediate) or `background` (via jobs)
+    - **vector**: Enable vector/embedding search with `sourceFields` to generate embeddings from
 
 13. **Automatic Fields** (DO NOT add these manually):
     - When `"defaults": { "timestamps": true }` is set, `createdAt` and `updatedAt` are added automatically
