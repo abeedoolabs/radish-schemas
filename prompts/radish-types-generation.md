@@ -102,22 +102,30 @@ The following entities are already provided by the system. DO NOT recreate them 
 
 7. **Relationships**: Use `{ "type": "objectId", "ref": "EntityName" }` for references
 
-8. **Scope** (optional): For relationship-based access control — allows access if the user owns a related entity:
+8. **Scope** (optional): Scoped access control with two modes:
+
+   **Through-entity** — access if user owns a related entity:
    ```json
    {
      "Subscription": {
-       "plural": "subscriptions",
        "ownership": "system",
-       "scope": {
-         "field": "appId",
-         "through": "App",
-         "ownerField": "ownerId"
-       },
+       "scope": { "field": "appId", "through": "App", "ownerField": "ownerId" },
        "fields": { ... }
      }
    }
    ```
-   This means: "a user can access this Subscription if they own the App referenced by `appId`." Use `scope` when an entity is system-owned but access depends on ownership of a related entity.
+
+   **Direct-match** — access when record's field matches a user field (multi-tenant):
+   ```json
+   {
+     "Invoice": {
+       "ownership": "system",
+       "scope": { "field": "orgId", "matchUserField": "orgIds" },
+       "fields": { ... }
+     }
+   }
+   ```
+   `matchUserField` supports array match — if `user.orgIds` is an array, checks if `record.orgId` is in that array.
 
 9. **Enhanced Enums**: Use key-value pairs for better UX:
    ```json

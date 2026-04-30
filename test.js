@@ -97,6 +97,32 @@ if (!resultScope.valid) {
 }
 console.log('');
 
+// Test 4a2: Types blueprint with scope direct-match mode
+console.log('Test 4a2: Types blueprint with scope direct-match');
+const directMatchBlueprint = {
+  version: 1,
+  entities: {
+    Invoice: {
+      plural: 'invoices',
+      ownership: 'system',
+      scope: {
+        field: 'orgId',
+        matchUserField: 'orgIds'
+      },
+      fields: {
+        orgId: { type: 'objectId', required: true },
+        amount: { type: 'float', required: true }
+      }
+    }
+  }
+};
+const resultDirect = validateBlueprint(directMatchBlueprint, 'types');
+console.log(resultDirect.valid ? '✅ PASS' : '❌ FAIL');
+if (!resultDirect.valid) {
+  console.log('Errors:', formatValidationErrors(resultDirect.errors));
+}
+console.log('');
+
 // Test 4b: Types blueprint with field-level access control
 console.log('Test 4b: Types blueprint with field-level access');
 const accessBlueprint = {
