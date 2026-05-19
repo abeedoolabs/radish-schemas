@@ -151,3 +151,6 @@ Two-version system:
 3. Test with `node test.js`
 4. Update prompt if schema structure changed
 5. Bump version appropriately
+
+@/Users/ctmeece/Projects/abeedoo-knowledge/contexts/base/CONTEXT.md
+@/Users/ctmeece/Projects/abeedoo-knowledge/AGENT_INSTRUCTIONS.md
