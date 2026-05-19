@@ -10,7 +10,7 @@
     "prepare": "svelte-kit sync || echo ''"
   },
   "dependencies": {
-    "@radish/schemas": "file:.."
+    "@abeedoo/radish-schemas": "file:.."
   },
   "devDependencies": {
     "@sveltejs/adapter-node": "^5.0.0",

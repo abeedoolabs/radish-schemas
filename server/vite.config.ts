@@ -5,7 +5,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
   ssr: {
-    external: ['@radish/schemas']
+    external: ['@abeedoo/radish-schemas']
   },
   server: {
     strictPort: false,

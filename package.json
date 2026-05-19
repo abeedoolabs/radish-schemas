@@ -1,5 +1,5 @@
 {
-  "name": "@radish/schemas",
+  "name": "@abeedoo/radish-schemas",
   "version": "1.7.7",
   "description": "Shared JSON schemas, validators, and prompts for Radish CLI ecosystem",
   "main": "index.js",
@@ -46,6 +46,6 @@
     "ajv-formats": "^2.1.1"
   },
   "publishConfig": {
-    "@radish:registry": "https://gitlab.mini1.abeedoo.com/api/v4/projects/6/packages/npm/"
+    "access": "public"
   }
 }

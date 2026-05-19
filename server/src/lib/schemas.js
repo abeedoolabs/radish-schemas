@@ -1,4 +1,4 @@
-// Bridge to parent @radish/schemas package (installed as file:..)
+// Bridge to parent @abeedoo/radish-schemas package (installed as file:..)
 export {
   validateBlueprint,
   validateFromJSON,
@@ -13,7 +13,7 @@ export {
   componentsSchema,
   themeSchema,
   getSchema
-} from '@radish/schemas';
+} from '@abeedoo/radish-schemas';
 
 export {
   buildPrompt,
@@ -24,4 +24,4 @@ export {
   getComponentsPrompt,
   getThemePrompt,
   getSchemaForPrompt
-} from '@radish/schemas/prompts';
+} from '@abeedoo/radish-schemas/prompts';
