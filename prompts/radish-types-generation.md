@@ -163,7 +163,12 @@ The following entities are already provided by the system. DO NOT recreate them 
           "engine": "typesense",
           "indexName": "products",
           "fields": {
-            "searchable": ["name", "description", "brand"],
+            "searchable": [
+              { "field": "name", "stem": true },
+              { "field": "description", "stem": true },
+              "sku",
+              "brand"
+            ],
             "filterable": ["brand", "price", "categories"],
             "sortable": ["price", "name", "createdAt"],
             "facetable": ["brand", "categories"]
@@ -182,6 +187,7 @@ The following entities are already provided by the system. DO NOT recreate them 
     - **indexName**: Custom index name (defaults to entity plural)
     - **sync**: `inline` (immediate) or `background` (via jobs)
     - **vector**: Enable vector/embedding search with `sourceFields` to generate embeddings from
+    - **searchable**: Each entry is either a plain field name or `{ "field": "name", "stem": true }`. Stemming reduces terms to their word stems at index time (`computers` → `computer`), so a plural query matches singular text as an exact match rather than relying on typo correction. Set `stem: true` only on prose fields (name, description, summary, body). Never stem identifiers (`sku`, `slug`, `code`), brand or category values, anything listed under `filterable`/`facetable`, or non-string fields — stemming a facet value breaks the filter that reads it.
 
 13. **Expiration / TTL** (optional): For entities whose records should be purged automatically (sessions, tokens, logs, temporary uploads), use the entity-level `ttl` shorthand:
     ```json

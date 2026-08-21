@@ -114,8 +114,27 @@
                   "properties": {
                     "searchable": {
                       "type": "array",
-                      "items": { "type": "string" },
-                      "description": "Fields included in full-text search queries"
+                      "items": {
+                        "oneOf": [
+                          { "type": "string" },
+                          {
+                            "type": "object",
+                            "required": ["field"],
+                            "additionalProperties": false,
+                            "properties": {
+                              "field": {
+                                "type": "string",
+                                "description": "Field name"
+                              },
+                              "stem": {
+                                "type": "boolean",
+                                "description": "Reduce terms to their word stems at index time so plural queries match singular text. Prose fields only — never identifiers, facets, or non-string fields, since stemming a facet value breaks the filter that reads it."
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "description": "Fields included in full-text search queries. Either a field name, or an object with per-field options such as stemming."
                     },
                     "filterable": {
                       "type": "array",

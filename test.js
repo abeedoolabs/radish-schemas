@@ -593,4 +593,65 @@ if (!result19.valid) {
 }
 console.log('');
 
+// Test 20: Searchable fields as strings and objects (stemming)
+console.log('Test 20: Valid searchable fields (mixed string + stem objects)');
+const stemBlueprint = {
+  version: 1,
+  entities: {
+    Product: {
+      plural: 'products',
+      search: {
+        enabled: true,
+        fields: {
+          searchable: [
+            { field: 'name', stem: true },
+            { field: 'description', stem: true },
+            'sku',
+            'brand'
+          ],
+          filterable: ['brand', 'status'],
+          sortable: ['price', 'createdAt'],
+          facetable: ['brand']
+        }
+      },
+      fields: {
+        name: { type: 'string', required: true },
+        sku: { type: 'string' }
+      }
+    }
+  }
+};
+const result20 = validateBlueprint(stemBlueprint, 'types');
+console.log(result20.valid ? '✅ PASS' : '❌ FAIL');
+if (!result20.valid) {
+  console.log('Errors:', formatValidationErrors(result20.errors));
+}
+console.log('');
+
+// Test 21: Invalid searchable field object (missing field, unknown property)
+console.log('Test 21: Invalid searchable field object (should fail)');
+const badStemBlueprint = {
+  version: 1,
+  entities: {
+    Product: {
+      plural: 'products',
+      search: {
+        enabled: true,
+        fields: {
+          searchable: [{ stem: true, weight: 5 }]
+        }
+      },
+      fields: {
+        name: { type: 'string' }
+      }
+    }
+  }
+};
+const result21 = validateBlueprint(badStemBlueprint, 'types');
+console.log(!result21.valid ? '✅ PASS' : '❌ FAIL');
+if (!result21.valid) {
+  console.log('Expected errors:', formatValidationErrors(result21.errors));
+}
+console.log('');
+
 console.log('All tests completed!');
