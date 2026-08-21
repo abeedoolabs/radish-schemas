@@ -545,4 +545,52 @@ console.log(schemas.components ? '✅ components schema loaded' : '❌ component
 console.log(schemas.theme ? '✅ theme schema loaded' : '❌ theme schema missing');
 console.log('');
 
+// Test 18: TTL configuration (entity-level shorthand + index-level escape hatch)
+console.log('Test 18: Valid TTL configuration');
+const ttlBlueprint = {
+  version: 1,
+  entities: {
+    Session: {
+      plural: 'sessions',
+      ttl: { field: 'createdAt', days: 90 },
+      fields: {
+        token: { type: 'string', required: true },
+        createdAt: { type: 'isoDate' },
+        expiresAt: { type: 'isoDate' }
+      },
+      indexes: [
+        { fields: ['expiresAt'], expireAfterSeconds: 0 },
+        { fields: ['token'], unique: true }
+      ]
+    }
+  }
+};
+const result18 = validateBlueprint(ttlBlueprint, 'types');
+console.log(result18.valid ? '✅ PASS' : '❌ FAIL');
+if (!result18.valid) {
+  console.log('Errors:', formatValidationErrors(result18.errors));
+}
+console.log('');
+
+// Test 19: Invalid TTL configuration (days below minimum, missing field)
+console.log('Test 19: Invalid TTL configuration (should fail)');
+const badTtlBlueprint = {
+  version: 1,
+  entities: {
+    Session: {
+      plural: 'sessions',
+      ttl: { days: 0 },
+      fields: {
+        token: { type: 'string' }
+      }
+    }
+  }
+};
+const result19 = validateBlueprint(badTtlBlueprint, 'types');
+console.log(!result19.valid ? '✅ PASS' : '❌ FAIL');
+if (!result19.valid) {
+  console.log('Expected errors:', formatValidationErrors(result19.errors));
+}
+console.log('');
+
 console.log('All tests completed!');

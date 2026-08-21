@@ -183,7 +183,27 @@ The following entities are already provided by the system. DO NOT recreate them 
     - **sync**: `inline` (immediate) or `background` (via jobs)
     - **vector**: Enable vector/embedding search with `sourceFields` to generate embeddings from
 
-13. **Automatic Fields** (DO NOT add these manually):
+13. **Expiration / TTL** (optional): For entities whose records should be purged automatically (sessions, tokens, logs, temporary uploads), use the entity-level `ttl` shorthand:
+    ```json
+    {
+      "Session": {
+        "plural": "sessions",
+        "ttl": { "field": "createdAt", "days": 90 },
+        "fields": { ... }
+      }
+    }
+    ```
+    - **field**: date field the expiration is measured from
+    - **days**: whole days (minimum 1) after that field's value before a record expires
+
+    For precise control, set `expireAfterSeconds` on an index instead. Use `0` when the field already holds the exact expiration timestamp:
+    ```json
+    "indexes": [
+      { "fields": ["expiresAt"], "expireAfterSeconds": 0 }
+    ]
+    ```
+
+14. **Automatic Fields** (DO NOT add these manually):
     - When `"defaults": { "timestamps": true }` is set, `createdAt` and `updatedAt` are added automatically
     - When `"defaults": { "owned": true }` is set, `ownerId` is added automatically
     - Adding these fields manually causes duplication

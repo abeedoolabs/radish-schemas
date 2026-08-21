@@ -208,6 +208,26 @@
                 }
               }
             },
+            "ttl": {
+              "type": "object",
+              "description": "Automatic document expiration. Generates a MongoDB TTL index on the given date field.",
+              "required": [
+                "field",
+                "days"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "description": "Date field documents expire relative to (e.g., 'createdAt')"
+                },
+                "days": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Number of days after the field value before a document expires"
+                }
+              }
+            },
             "fields": {
               "type": "object",
               "minProperties": 1,
@@ -530,6 +550,11 @@
                   },
                   "name": {
                     "type": "string"
+                  },
+                  "expireAfterSeconds": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "TTL index: seconds after the indexed date field before a document expires"
                   }
                 }
               }
